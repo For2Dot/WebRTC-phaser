@@ -137,8 +137,6 @@ class Network {
     }
 }
 
-
-
 class Connection {
     /**
      * @callback messageListener
@@ -180,10 +178,23 @@ class Connection {
     }
 }
 
+let host;
+const createHost = () => {
+    host = new Network();
+    host.createRoom((roomId) => {
+        net.joinRoom(roomId);
+        document.getElementById("message").value = roomId;
+    });
+    host.addListener("chat", (x) => {
+        console.log(x);
+        host.broadcase("chat", { id: x.connId, data: x.payload });
+    });
+}
 const net = new Network();
 
 net.addListener("chat", (x) => {
-    document.getElementById("messages").value += `${x.payload}\n`;
+    const msg = `${x.payload.id}: ${x.payload.data}`
+    document.getElementById("messages").value += `${msg}\n`;
 });
 
 document.getElementById("send").addEventListener("click", () => {
@@ -192,12 +203,7 @@ document.getElementById("send").addEventListener("click", () => {
     net.broadcase("chat", text);
 });
 
-document.getElementById("createRoom").addEventListener("click", () => {
-    net.createRoom((roomId) => {
-        document.getElementById("message").value = roomId;
-    });
-});
-
+document.getElementById("createRoom").addEventListener("click", createHost);
 document.getElementById("joinRoom").addEventListener("click", () => {
     roomId = document.getElementById("message").value;
     document.getElementById("message").value = "";
