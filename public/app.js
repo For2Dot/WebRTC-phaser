@@ -15,6 +15,7 @@ class Network {
         this.connections = [];
         this.socket = io();
         this.roomId = null;
+        this.isHost = false;
         /**
          * @type {Object<string, Array<jsonListener>>}
          */
@@ -62,7 +63,15 @@ class Network {
      */
     createRoom(createRoomCallback) {
         this.createRoomCallback = createRoomCallback;
+        this.isHost = true;
         this.socket.emit("createRoom");
+    }
+
+    freezeRoom() {
+        if (this.isHost == false)
+            return;
+        this.socket.emit("freezeRoom", { roomId: this.roomId });
+        this.socket.close();
     }
 
     /**
@@ -128,9 +137,10 @@ class Network {
     }
 
     #createConnection(connId) {
+        const isSingleConn = connId == null;
         if (connId == null)
             connId = Math.random().toString(36).slice(2, 16);
-        const connection = new Connection(connId, this.socket);
+        const connection = new Connection(connId, this.socket, isSingleConn);
         connection.setListener(this._eventListener);
         this.connections.push(connection);
         return connection;
@@ -143,7 +153,7 @@ class Connection {
      * @param {string} data
      */
 
-    constructor(connId, socket) {
+    constructor(connId, socket, isSingleConn = false) {
         this.connId = connId;
         this.socket = socket;
         this.listener = console.log;
@@ -161,6 +171,13 @@ class Connection {
             this.channel = event.channel;
             this.channel.addEventListener("message", (event) => this.listener(event.data));
         });
+        this.conn.addEventListener("connectionstatechange", () => {
+            if (!isSingleConn)
+                return;
+            if (this.conn.connectionState === "connecting")
+                return;
+            socket.close();
+        })
     }
 
     /**

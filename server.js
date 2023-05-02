@@ -49,4 +49,10 @@ wss.on("connection", socket => {
         console.log(socket.id, "ice", connId, candidate);
         socket.to(connId).emit("ice", { candidate, connId });
     });
+    socket.on("freezeRoom", (payload) => {
+        const { roomId } = payload;
+        console.log("freezeRoom", roomId);
+        if (rooms[roomId])
+            delete rooms[roomId];
+    });
 });
