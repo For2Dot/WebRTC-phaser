@@ -1,88 +1,109 @@
-// https://github.com/nomadcoders/noom/blob/master/src/public/js/app.js
+class Network {
+    /**
+     * @callback createRoomCallback
+     * @param {string} roomId
+     */
 
-const socket = io();
+    constructor() {
+        this.connections = [];
+        this.socket = io();
+        this.roomId = null;
+        this.socket.on("createRoom", (roomId) => {
+            this.roomId = roomId;
+            if (this.createRoomCallback != null)
+                this.createRoomCallback(roomId);
+        });
+        this.socket.on("offer", async (payload) => {
+            const { connId, offer } = payload;
+            const connection = this.#createConnection(connId);
+            await connection.conn.setRemoteDescription(offer);
+            const answer = await connection.conn.createAnswer();
+            await connection.conn.setLocalDescription(answer);
+            this.socket.emit("answer", { connId, answer });
+        });
+        this.socket.on("answer", async (payload) => {
+            const { connId, answer } = payload;
+            const connection = this.connections.find(x => x.connId === connId);
+            if (connection === undefined)
+                return; // TODO: error handling
+            await connection.conn.setRemoteDescription(answer);
+        });
+        this.socket.on("ice", (payload) => {
+            console.log(payload);
+            const { candidate, connId } = payload;
+            const connection = this.connections.find(x => x.connId === connId);
+            if (connection === undefined)
+                return; // TODO: error handling
+            connection.conn.addIceCandidate(candidate);
+        });
+    }
 
-let myDataChannel = null;
-let myPeerConnection = null;
-let isHost = false;
-let roomId;
+    /**
+     * @param {createRoomCallback} createRoomCallback 
+     */
+    createRoom(createRoomCallback) {
+        this.createRoomCallback = createRoomCallback;
+        this.socket.emit("createRoom");
+    }
 
-function makeConnection() {
-    myPeerConnection = new RTCPeerConnection();
-    myDataChannel = myPeerConnection.createDataChannel("chat");
-    myDataChannel.addEventListener("message", (event) => console.log(event.data));
-    console.log("made data channel");
+    /**
+     * @param {string} roomId
+     */
+    async joinRoom(roomId) {
+        const connection = this.#createConnection();
+        const connId = connection.connId;
+        const offer = await connection.conn.createOffer();
+        await connection.conn.setLocalDescription(offer);
+        this.socket.emit("offer", { roomId, connId, offer });
+    }
 
-    myPeerConnection.addEventListener("icecandidate", (data) => {
-        console.log("sent candidate");
-        socket.emit("ice", data.candidate, roomId);
-    });
-    myPeerConnection.addEventListener("addstream", (data) => {
-        console.log(data);
-    });
-    myPeerConnection.addEventListener("datachannel", (event) => {
-        myDataChannel = event.channel;
-        event.channel.addEventListener("message", (event) =>
-            document.getElementById("messages").value
-            = `${document.getElementById("messages").value}${event.target.id}: ${event.data}\n`
-        );
-    });
+    #createConnection(connId) {
+        if (connId == null)
+            connId = Math.random().toString(36).slice(2, 16);
+        const connection = new Connection(connId, this.socket);
+        this.connections.push(connection);
+        return connection;
+    }
 }
-makeConnection();
 
-socket.on("ice", (ice) => {
-    console.log("received candidate", ice);
-    myPeerConnection.addIceCandidate(ice);
-});
+class Connection {
+    constructor(connId, socket) {
+        this.connId = connId;
+        this.socket = socket;
+        this.action = console.log;
+        this.conn = new RTCPeerConnection();
+        this.channel = this.conn.createDataChannel("data");
+        this.channel.addEventListener("message", (event) => this.action(event));
+        this.conn.addEventListener("icecandidate", (data) => {
+            const payload = {
+                candidate: data.candidate,
+                connId: this.connId,
+            }
+            this.socket.emit("ice", payload);
+        });
+        this.conn.addEventListener("datachannel", (event) => {
+            this.channel = event.channel;
+            this.channel.addEventListener("message", (event) => this.action(event));
+        });
+    }
+}
 
-socket.on("offer", async (offer, id) => {
-    console.log("received the offer");
-    myPeerConnection.setRemoteDescription(offer);
-    const answer = await myPeerConnection.createAnswer();
-    myPeerConnection.setLocalDescription(answer);
-    socket.emit("answer", answer, id);
-    console.log(offer, answer);
-    console.log("sent the answer");
-});
-
-socket.on("answer", (answer) => {
-    console.log("received the answer");
-    console.log(answer);
-    myPeerConnection.setRemoteDescription(answer);
-});
+const net = new Network();
 
 document.getElementById("send").addEventListener("click", () => {
-    const text = document.getElementById("message").value;
-    document.getElementById("message").value = "";
-    myDataChannel.send(text);
+    // const text = document.getElementById("message").value;
+    // document.getElementById("message").value = "";
+    // myDataChannel.send(text);
 });
 
 document.getElementById("createRoom").addEventListener("click", () => {
-    const text = document.getElementById("message").value;
-    document.getElementById("message").value = "";
-    socket.emit("createRoom",)
-});
-socket.on("createdRoom", (_roomId) => {
-    console.log(_roomId);
-    isHost = true;
-    roomId = _roomId;
-    document.getElementById("message").value = roomId;
+    net.createRoom((roomId) => {
+        document.getElementById("message").value = roomId;
+    });
 });
 
 document.getElementById("joinRoom").addEventListener("click", () => {
-    if (isHost) {
-        alert("호스트는 다른 방에 참가 불가");
-        return;
-    }
     roomId = document.getElementById("message").value;
     document.getElementById("message").value = "";
-    socket.emit("joinRoom", roomId)
-});
-socket.on("joinRoom", async (id) => {
-    console.log("joinRoom", id);
-    const offer = await myPeerConnection.createOffer();
-    myPeerConnection.setLocalDescription(offer);
-    console.log("sent the offer");
-    console.log(offer);
-    socket.emit("offer", offer, id);
+    net.joinRoom(roomId);
 });

@@ -1,5 +1,3 @@
-// https://github.com/nomadcoders/noom/blob/master/src/server.js
-
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
@@ -20,42 +18,35 @@ server.listen(3000);
 const rooms = {};
 
 wss.on("connection", socket => {
-    socket.on("createRoom", async () => {
+    socket.on("createRoom", () => {
         const randomId = Math.random().toString(36).slice(2, 16);
         rooms[randomId] = {
             host: socket.id,
         };
         socket.join(randomId);
         console.log(socket.id, "createRoom", randomId, rooms);
-        socket.emit("createdRoom", randomId);
+        socket.emit("createRoom", randomId);
     });
-    socket.on("joinRoom", async (roomId) => {
-        console.log(socket.id, "joinRoom", roomId);
-        const room = rooms[roomId];
-        if (room == null)
-            return;
-        const hostSocket = wss.sockets.sockets.get(room.host);
+    socket.on("offer", async (payload) => {
+        const { roomId, connId, offer } = payload;
+        console.log(socket.id, "offer", connId, roomId);
+        if (rooms[roomId] == null)
+            return; // TODO: deny offer
+        const hostSocket = wss.sockets.sockets.get(rooms[roomId].host);
         if (hostSocket == null)
-            return;
-        await socket.join(roomId);
-        hostSocket.emit("joinRoom", socket.id);
+            return; // TODO: deny offer
+        await hostSocket.join(connId);
+        await socket.join(connId);
+        socket.to(connId).emit("offer", { connId, offer });
     });
-    socket.on("offer", (offer, id) => {
-        console.log(socket.id, "offer", id);
-        const target = wss.sockets.sockets.get(id);
-        if (target == null)
-            return;
-        target.emit("offer", offer, socket.id);
+    socket.on("answer", (payload) => {
+        const { connId, answer } = payload;
+        console.log(socket.id, "answer", connId)
+        socket.to(connId).emit("answer", { connId, answer });
     });
-    socket.on("answer", (answer, id) => {
-        console.log(socket.id, "answer", id);
-        const target = wss.sockets.sockets.get(id);
-        if (target == null)
-            return;
-        target.emit("answer", answer, id);
-    });
-    socket.on("ice", (ice, roomId) => {
-        console.log(socket.id, "ice", ice, roomId);
-        socket.to(roomId).emit("ice", ice);
+    socket.on("ice", (payload) => {
+        const { candidate, connId } = payload;
+        console.log(socket.id, "ice", connId, candidate);
+        socket.to(connId).emit("ice", { candidate, connId });
     });
 });
