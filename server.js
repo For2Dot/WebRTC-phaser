@@ -46,7 +46,7 @@ wss.on("connection", socket => {
     });
     socket.on("ice", (payload) => {
         const { candidate, connId } = payload;
-        console.log(socket.id, "ice", connId, candidate);
+        console.log(socket.id, "ice", connId);
         socket.to(connId).emit("ice", { candidate, connId });
     });
     socket.on("freezeRoom", (payload) => {
