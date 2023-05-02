@@ -3,11 +3,30 @@ class Network {
      * @callback createRoomCallback
      * @param {string} roomId
      */
+    /**
+     * @callback jsonListener
+     * @param {Object} json
+     */
 
     constructor() {
+        /**
+         * @type {Array<Connection>}
+         */
         this.connections = [];
         this.socket = io();
         this.roomId = null;
+        /**
+         * @type {Object<string, Array<jsonListener>>}
+         */
+        this.eventListeners = {};
+        this._eventListener = (msg) => {
+            const data = this.#unpackPayload(msg)
+            for (const listenerType in this.eventListeners) {
+                const listeners = this.eventListeners[listenerType];
+                if (listenerType === data.type)
+                    listeners.forEach(x => x(data));
+            }
+        };
         this.socket.on("createRoom", (roomId) => {
             this.roomId = roomId;
             if (this.createRoomCallback != null)
@@ -57,23 +76,82 @@ class Network {
         this.socket.emit("offer", { roomId, connId, offer });
     }
 
+    /**
+     * @returns {Array<string>}
+     */
+    getConnIds() {
+        return this.connections.map(x => x.connId);
+    }
+
+    /**
+     * @param {string} connId 
+     * @param {string} type 
+     * @param {Object} payload javascript object for parsing to json
+     */
+    send(connId, type, payload) {
+        const connection = this.connections.find(x => x.connId === connId);
+        if (connection == null)
+            throw new Error();
+        connection.send(this.#packPayload(connId, type, payload));
+    }
+
+    /**
+     * @param {string} type 
+     * @param {Object} payload javascript object for parsing to json
+     */
+    broadcase(type, payload) {
+        this.connections.forEach(x => {
+            x.send(this.#packPayload(x.connId, type, payload));
+        });
+    }
+
+    /**
+     * @param {string} type
+     * @param {jsonListener} listener 
+     */
+    addListener(type, listener) {
+        if (this.eventListeners[type] == null)
+            this.eventListeners[type] = [];
+        this.eventListeners[type].push(listener);
+    }
+
+    #packPayload(connId, type, payload) {
+        return JSON.stringify({
+            connId,
+            type,
+            payload
+        });
+    }
+
+    #unpackPayload(object) {
+        return JSON.parse(object);
+    }
+
     #createConnection(connId) {
         if (connId == null)
             connId = Math.random().toString(36).slice(2, 16);
         const connection = new Connection(connId, this.socket);
+        connection.setListener(this._eventListener);
         this.connections.push(connection);
         return connection;
     }
 }
 
+
+
 class Connection {
+    /**
+     * @callback messageListener
+     * @param {string} data
+     */
+
     constructor(connId, socket) {
         this.connId = connId;
         this.socket = socket;
-        this.action = console.log;
+        this.listener = console.log;
         this.conn = new RTCPeerConnection();
         this.channel = this.conn.createDataChannel("data");
-        this.channel.addEventListener("message", (event) => this.action(event));
+        this.channel.addEventListener("message", (event) => this.listener(event.data));
         this.conn.addEventListener("icecandidate", (data) => {
             const payload = {
                 candidate: data.candidate,
@@ -83,17 +161,35 @@ class Connection {
         });
         this.conn.addEventListener("datachannel", (event) => {
             this.channel = event.channel;
-            this.channel.addEventListener("message", (event) => this.action(event));
+            this.channel.addEventListener("message", (event) => this.listener(event.data));
         });
+    }
+
+    /**
+     * @param {string} msg 
+     */
+    send(msg) {
+        this.channel.send(msg);
+    }
+
+    /**
+     * @param {messageListener} listener 
+     */
+    setListener(listener) {
+        this.listener = listener;
     }
 }
 
 const net = new Network();
 
+net.addListener("chat", (x) => {
+    document.getElementById("messages").value += `${x.payload}\n`;
+});
+
 document.getElementById("send").addEventListener("click", () => {
-    // const text = document.getElementById("message").value;
-    // document.getElementById("message").value = "";
-    // myDataChannel.send(text);
+    const text = document.getElementById("message").value;
+    document.getElementById("message").value = "";
+    net.broadcase("chat", text);
 });
 
 document.getElementById("createRoom").addEventListener("click", () => {
