@@ -50,7 +50,6 @@ class Network {
             await connection.conn.setRemoteDescription(answer);
         });
         this.socket.on("ice", (payload) => {
-            console.log(payload);
             const { candidate, connId } = payload;
             const connection = this.connections.find(x => x.connId === connId);
             if (connection === undefined)
@@ -229,22 +228,47 @@ class Connection {
     }
 }
 
+function createNetwork() {
+    this.net = new Network();
+    this.net.setStateListener((conn, state) => {
+        if (this.state[conn.connId] == null)
+            this.state[conn.connId] = "connecting";
+        this.state[conn.connId] = state;
+        this.connListener.forEach((x) => x(conn.connId, state));
+    });
+}
+
 class Node {
+    /**
+     * @callback connectListener
+     * @param {string} connId
+     * @param {string} state
+     */
+
     constructor() {
         /**
          * @type {Network}
          */
         this.net = null;
+        this.state = {};
+        this.connListener = [console.log];
     }
 
     /**
      * @param {string} type
      * @param {dataListener} listener 
-     */
+    */
     addListener(type, listener) {
         if (this.net === null)
             throw new Error("No rtc is setup");
         this.net.addListener(type, listener);
+    }
+
+    /**
+     * @param {connectListener} event
+     */
+    addConnListener(event) {
+        this.connListener.push(event);
     }
 }
 
@@ -264,8 +288,7 @@ export class Server extends Node {
      */
     openRoom(roomId) {
         if (this.net === null)
-            this.net = new Network();
-
+            createNetwork.bind(this)();
         return new Promise((res) => {
             if (this.roomId !== null) {
                 res(this.roomId);
@@ -320,7 +343,6 @@ export class Server extends Node {
 export class Client extends Node {
     constructor() {
         super();
-        this.state;
     }
 
     /**
@@ -329,21 +351,18 @@ export class Client extends Node {
      */
     async joinRoom(roomId) {
         if (this.net === null) {
-            this.net = new Network();
-            this.state = "connecting";
-            this.net.setStateListener((_, state) => {
-                this.state = state;
-            });
+            createNetwork.bind(this)();
         }
         await this.net.joinRoom(roomId);
         return new Promise((res, rej) => {
             const id = setInterval(() => {
-                if (this.state === "connecting")
+                const connId = this.net.connections[0].connId;
+                if (this.state[connId] === "connecting")
                     return;
-                if (this.state === "connected" || this.state === "open")
+                if (this.state[connId] === "connected" || this.state[connId] === "open")
                     res(this.net.getConnIds()[0]);
                 else
-                    rej(this.state);
+                    rej(this.state[connId]);
                 clearInterval(id);
             }, 100);
         });
