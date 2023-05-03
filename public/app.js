@@ -1,25 +1,17 @@
 import { Server, Client } from "./webrtc.js"
+import serverActivity from "./server.js"
+import clientActivity from "./client.js"
 
 const server = new Server();
 async function startServer() {
     await server.openRoom(roomId);
-    server.addListener("chat", (x) => {
-        server.broadcast("chat", { id: x.connId, data: x.payload });
-    });
+    serverActivity(server);
 }
 
 const client = new Client();
 async function startClient() {
     await client.joinRoom(roomId);
-    client.addListener("chat", (data) => {
-        const msg = `${data.payload.id}: ${data.payload.data}`
-        document.getElementById("messages").value += `${msg}\n`;
-    });
-    document.getElementById("send").addEventListener("click", () => {
-        const text = document.getElementById("message").value;
-        document.getElementById("message").value = "";
-        client.send("chat", text);
-    });
+    clientActivity(client);
 }
 
 if (isHost) startServer().then(startClient);
