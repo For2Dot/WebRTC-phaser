@@ -60,12 +60,13 @@ class Network {
     }
 
     /**
+     * @param {string} roomId
      * @param {createRoomCallback} createRoomCallback 
      */
-    createRoom(createRoomCallback) {
+    createRoom(roomId, createRoomCallback) {
         this.createRoomCallback = createRoomCallback;
         this.isHost = true;
-        this.socket.emit("createRoom");
+        this.socket.emit("createRoom", { roomId });
     }
 
     freezeRoom() {
@@ -237,7 +238,7 @@ class Node {
 /**
  * @implements {Node}
  */
-class Server extends Node {
+export class Server extends Node {
     constructor() {
         super();
         this.roomId = null;
@@ -245,9 +246,10 @@ class Server extends Node {
 
     /**
      * Open a room to receive users.
+     * @param {string} roomId
      * @returns {Promise<string>} room id
      */
-    openRoom() {
+    openRoom(roomId) {
         if (this.net === null)
             this.net = new Network();
 
@@ -256,7 +258,7 @@ class Server extends Node {
                 res(this.roomId);
                 return;
             }
-            this.net.createRoom((roomId) => {
+            this.net.createRoom(roomId, (roomId) => {
                 this.roomId = roomId;
                 res(roomId);
             });
@@ -302,7 +304,7 @@ class Server extends Node {
 /**
  * @extends {Node}
  */
-class Client extends Node {
+export class Client extends Node {
     constructor() {
         super();
         this.state;
@@ -341,11 +343,3 @@ class Client extends Node {
         this.net.send(connId, type, payload);
     }
 }
-
-const server = new Server();
-const client = new Client();
-async function run() {
-    const roomId = await server.openRoom();
-    const connId = await client.joinRoom(roomId);
-}
-run();

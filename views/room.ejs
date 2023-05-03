@@ -1,0 +1,24 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>WebRTC Text Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>WebRTC Text Chat</h1>
+    <div>
+      <textarea id="messages" rows="10" cols="50" disabled></textarea>
+    </div>
+    <div>
+      <input type="text" id="message" size="50">
+      <button id="send">Send</button>
+    </div>
+    <script>
+        var isHost = "<%= isHost %>" === "true";
+        var roomId = "<%= roomId %>";
+    </script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -1,39 +1,29 @@
-// let host;
-// const createHost = () => {
-//     host = new Network();
-//     host.createRoom((roomId) => {
-//         net.joinRoom(roomId);
-//         document.getElementById("message").value = roomId;
-//     });
-//     host.addListener("chat", (x) => {
-//         console.log(x);
-//         host.broadcase("chat", { id: x.connId, data: x.payload });
-//     });
-// }
-// const net = new Network();
-
-// net.addListener("chat", (x) => {
-//     const msg = `${x.payload.id}: ${x.payload.data}`
-//     document.getElementById("messages").value += `${msg}\n`;
-// });
-
-// document.getElementById("send").addEventListener("click", () => {
-//     const text = document.getElementById("message").value;
-//     document.getElementById("message").value = "";
-//     net.broadcase("chat", text);
-// });
-
-// document.getElementById("createRoom").addEventListener("click", createHost);
-// document.getElementById("joinRoom").addEventListener("click", () => {
-//     roomId = document.getElementById("message").value;
-//     document.getElementById("message").value = "";
-//     net.joinRoom(roomId);
-// });
+import { Server, Client } from "./webrtc.js"
 
 const server = new Server();
+async function startServer() {
+    await server.openRoom(roomId);
+    server.addListener("chat", (x) => {
+        server.broadcast("chat", { id: x.connId, data: x.payload });
+    });
+}
+
 const client = new Client();
-// async function run() {
-//     const roomId = await server.openRoom();
-//     const connId = await client.joinRoom(roomId);
-// }
-// run();
+async function startClient() {
+    await client.joinRoom(roomId);
+    client.addListener("chat", (data) => {
+        const msg = `${data.payload.id}: ${data.payload.data}`
+        document.getElementById("messages").value += `${msg}\n`;
+    });
+    document.getElementById("send").addEventListener("click", () => {
+        const text = document.getElementById("message").value;
+        document.getElementById("message").value = "";
+        client.send("chat", text);
+    });
+}
+
+if (isHost) startServer().then(startClient);
+else startClient();
+
+window.server = server;
+window.client = client;

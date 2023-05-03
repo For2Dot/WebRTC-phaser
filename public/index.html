@@ -1,23 +1,27 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>WebRTC Text Chat</title>
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    <h1>WebRTC Text Chat</h1>
-    <div>
-      <textarea id="messages" rows="10" cols="50" disabled></textarea>
-    </div>
-    <div>
-      <input type="text" id="message" size="50">
-      <button id="send">Send</button>
-      <button id="createRoom">createRoom</button>
-      <button id="joinRoom">joinRoom</button>
-    </div>
-    <script src="/webrtc.js"></script>
-    <script src="/app.js"></script>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css"> 
+    <script>
+        function joinRoom() {
+            const roomId = prompt("roomId");
+            if (roomId == null)
+                return;
+            window.location.href = `/join/${roomId}`;
+        }
+        function openRoom() {
+            window.location.href = "new";
+        }
+    </script>
+    <main>
+        <button onclick="openRoom()">Open</button>
+        <button onclick="joinRoom()">Join</button>
+    </main>
+</body>
 </html>
