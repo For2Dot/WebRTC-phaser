@@ -181,7 +181,20 @@ class Connection {
         this.connId = connId;
         this.socket = socket;
         this.listener = console.log;
-        this.conn = new RTCPeerConnection();
+        const stuns = {
+            iceServers: [
+                {
+                    urls: [
+                        "stun:stun.l.google.com:19302",
+                        "stun:stun1.l.google.com:19302",
+                        "stun:stun2.l.google.com:19302",
+                        "stun:stun3.l.google.com:19302",
+                        "stun:stun4.l.google.com:19302",
+                    ],
+                },
+            ],
+        }
+        this.conn = new RTCPeerConnection(stuns);
         this.channel = this.conn.createDataChannel("data");
         this.channel.addEventListener("message", (event) => this.listener(event.data));
         this.conn.addEventListener("icecandidate", (data) => {
