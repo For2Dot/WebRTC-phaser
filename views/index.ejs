@@ -9,6 +9,9 @@
 <body>
     <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css"> 
     <script>
+
+        const roomList = document.querySelector('#room_list');
+
         function joinRoom() {
             const roomId = prompt("roomId");
             if (roomId == null)
@@ -18,10 +21,19 @@
         function openRoom() {
             window.location.href = "new";
         }
+
     </script>
     <main>
         <button onclick="openRoom()">Open</button>
         <button onclick="joinRoom()">Join</button>
+        <div id="room_list">
+            <p>room list</p>
+            <ul>
+            <% room_list.forEach(room => { %>
+                <a href="/join/<%= room %>"><%= room %></a>
+            <% }); %>
+            </ul>
+        </div>
     </main>
 </body>
 </html>

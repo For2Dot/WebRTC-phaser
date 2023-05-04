@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <title>WebRTC Text Chat</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
   </head>
   <body>
     <h1>WebRTC Text Chat</h1>
@@ -14,10 +16,12 @@
     <div>
       <input type="text" id="message" size="50">
     </div>
+    <div id="simple-game"></div>
     <script>
         var isHost = "<%= isHost %>" === "true";
         var roomId = "<%= roomId %>";
     </script>
-    <script type="module" src="/app.js"></script>
+    <script type="module" src="/server/app.js"></script>
+    <script type="module" src="/client/game.js"></script>
   </body>
 </html>

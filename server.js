@@ -7,6 +7,11 @@ const __dirname = path.resolve();
 const app = express();
 const rooms = {};
 app.set('view engine', 'ejs');
+app.use(express.static("public"));
+
+app.get("/", async (req, res, next) => {
+    res.render("index", { room_list: Object.keys(rooms) });
+});
 
 app.get("/new", async (req, res, next) => {
     const roomId = Math.random().toString(36).slice(2, 16);
@@ -14,7 +19,6 @@ app.get("/new", async (req, res, next) => {
     res.redirect(`/join/${roomId}`);
 });
 
-app.use(express.static("public"));
 app.get("/join/:roomId", async (req, res, next) => {
     const roomId = req.params.roomId;
     if (rooms[roomId] == null) {
