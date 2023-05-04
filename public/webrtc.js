@@ -111,7 +111,8 @@ class Network {
      */
     broadcase(type, payload) {
         this.connections.forEach(x => {
-            x.send(this.#packPayload(x.connId, type, payload));
+            if (x.channel.readyState === "open")
+                x.send(this.#packPayload(x.connId, type, payload));
         });
     }
 
