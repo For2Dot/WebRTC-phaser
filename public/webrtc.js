@@ -5,7 +5,7 @@ class Network {
      */
     /**
      * @callback dataListener
-     * @param {{connId: string, type: string, payload: any}} json
+     * @param {{connId: string, payload: any}} json
      */
 
     constructor() {
@@ -259,7 +259,7 @@ class Node {
      * @param {string} type
      * @param {dataListener} listener 
     */
-    addListener(type, listener) {
+    addEventListener(type, listener) {
         if (this.net === null)
             throw new Error("No rtc is setup");
         this.net.addListener(type, listener);
