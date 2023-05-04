@@ -1,4 +1,6 @@
 import { Client } from "./webrtc.js";
+import clientData from "./../client/data.js";
+
 
 const data = [];
 window.data = data;
@@ -7,6 +9,19 @@ window.data = data;
  */
 export default function activity(client) {
     setInterval(render, 50);
+    clientData.onKeyEvent = (keyData) => {
+        client.send("keyPress", keyData);
+    };
+
+    client.addEventListener("start", ({ connId, payload }) => {
+        clientData.connId = connId;
+        clientData.onStart();
+    });
+
+    client.addEventListener("newPos", ({ connId, payload }) => {
+        clientData.players = payload;
+    });
+
     client.addEventListener("chat", ({ connId, payload }) => {
         const idx = data.findIndex(chat => chat.id === payload.id);
         if (idx === -1)
@@ -15,7 +30,7 @@ export default function activity(client) {
     });
     document.getElementById("message").addEventListener("input", (x) => {
         client.send("chat", x.currentTarget.value);
-    })
+    });
 }
 
 function render() {

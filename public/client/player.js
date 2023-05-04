@@ -1,7 +1,10 @@
+import clientData from "./data.js";
+
 export default class Player extends Phaser.Physics.Matter.Sprite {
 	constructor(data) {
-		let { scene, x, y, texture, frame } = data;
+		let { scene, x, y, texture, frame, id } = data;
 		super(scene.matter.world, x, y, texture, frame);
+		this.id = id;
 		this.scene.add.existing(this);
 
 		const { Body, Bodies } = Phaser.Physics.Matter.Matter;
@@ -22,16 +25,14 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 	update() {
 		const speed = 2.5;
 		let playerVelocity = new Phaser.Math.Vector2();
-		if (this.inputKeys.left.isDown) {
-			playerVelocity.x = -1;
-		} else if (this.inputKeys.right.isDown) {
-			playerVelocity.x = 1;
-		}
-		if (this.inputKeys.up.isDown) {
-			playerVelocity.y = -1;
-		} else if (this.inputKeys.down.isDown) {
-			playerVelocity.y = 1;
-		}
+		const player = clientData.players.find(x => x.id === this.id);
+		const dx = player.x - this.x;
+		const dy = player.y - this.y;
+
+		if (dx != 0 && Math.abs(dx) > 1)
+			playerVelocity.x = dx > 0 ? 1 : -1;
+		if (dy != 0 && Math.abs(dy) > 1)
+			playerVelocity.y = dy > 0 ? 1 : -1;
 		playerVelocity.normalize();
 		playerVelocity.scale(speed);
 		this.setVelocity(playerVelocity.x, playerVelocity.y);

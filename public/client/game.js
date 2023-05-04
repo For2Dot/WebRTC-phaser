@@ -1,8 +1,9 @@
 import BootScene from "./BootScene.js";
+import clientData from "./data.js";
 
 const config = {
-	width: 300,
-	height: 300,
+	width: window.innerWidth,
+	height: window.innerHeight,
 	backgroundColor: "#333333",
 	type: Phaser.AUTO,
 	parent: 'simple-game',
@@ -27,4 +28,7 @@ const config = {
 		]
 	}
 }
-new Phaser.Game(config);
+clientData.onStart = () => {
+	console.log('Starting game');
+	new Phaser.Game(config);
+};

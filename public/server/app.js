@@ -8,7 +8,7 @@ async function startServer() {
     serverActivity(server);
 }
 
-const client = new Client();
+export const client = new Client();
 async function startClient() {
     await client.joinRoom(roomId);
     clientActivity(client);
