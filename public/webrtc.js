@@ -358,7 +358,7 @@ export class Client extends Node {
         return new Promise((res, rej) => {
             const id = setInterval(() => {
                 const connId = this.net.connections[0].connId;
-                if (this.state[connId] === "connecting")
+                if (this.state[connId] == null || this.state[connId] === "connecting")
                     return;
                 if (this.state[connId] === "connected" || this.state[connId] === "open")
                     res(this.net.getConnIds()[0]);
