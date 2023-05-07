@@ -1,0 +1,50 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #333;
+    padding: 10px;
+}
+
+button {
+    margin-right: 5px;
+}
+
+#room_list {
+    background-color: aliceblue;
+    display: flex;
+    margin: 10px 0px 10px 0px;
+    padding: 5px 10px 5px 10px;
+    min-width: 220px;
+    width: fit-content;
+    border-radius: 4px;
+    flex-direction: column;
+}
+
+#room_list p {
+    font: 1.2em sans-serif;
+    font-weight: bold;
+    text-align: center;
+}
+#room_list ul {
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+} 
+
+#room_list li {
+    list-style-type: none;
+    margin: 5px 0px 5px 0px;
+    padding: 5px 0px 5px 0px;
+    border-radius: 4px;
+    background-color: #eee;
+    cursor: pointer;
+}
+
+#room_list a {
+    text-decoration: none;
+    margin: 5px 0 5px 0;
+}

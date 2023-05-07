@@ -10,7 +10,15 @@ app.set('view engine', 'ejs');
 app.use(express.static("public"));
 
 app.get("/", async (req, res, next) => {
-    res.render("index", { room_list: Object.keys(rooms) });
+    const roomInfo = Object.values(rooms).map(room => {
+        return {
+            roomId: room.roomId,
+            user_cnt: room.user_cnt,
+            host: room.host,
+        };
+    });
+
+    res.render("index", { room_list: roomInfo });
 });
 
 app.get("/new", async (req, res, next) => {
@@ -43,6 +51,7 @@ wss.on("connection", socket => {
         if (rooms[roomId] == null || rooms[roomId].checkout == null)
             return;
         rooms[roomId].host = socket.id;
+        rooms[roomId].roomId = roomId;
         socket.join(roomId);
         console.log(socket.id, "createRoom", roomId, rooms);
         socket.emit("createRoom", roomId);
@@ -58,6 +67,7 @@ wss.on("connection", socket => {
         await hostSocket.join(connId);
         await socket.join(connId);
         socket.to(connId).emit("offer", { connId, offer });
+        rooms[roomId].user_cnt = (rooms[roomId].user_cnt || 0) + 1;
     });
     socket.on("answer", (payload) => {
         const { connId, answer } = payload;
