@@ -6,6 +6,8 @@ const data = {
     onKeyEvent: null,
     onStart: null,
     connId: null,
+    keyState: {},
+    isStarted: false,
 };
 
 export default data;

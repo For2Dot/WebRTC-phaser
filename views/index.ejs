@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/ico" href="../assets/images/favicon.ico" />
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+    <link rel="stylesheet" href="styles/index.css">
     <title>Document</title>
 </head>
-<body>
-    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css"> 
-    <script>
 
+<body>
+    <button onclick="openRoom()">Open</button>
+    <button onclick="joinRoom()">Join</button>
+    <div id="room_list">
+        <p>room list</p>
+        <ul>
+            <% room_list.forEach(room=> { %>
+                <a href="/join/<%= room.roomId %>">
+                    <%= room.host %>'s room (<%= room.user_cnt %> / 4)
+                </a>
+                <% }); %>
+        </ul>
+    </div>
+    <script>
         const roomList = document.querySelector('#room_list');
 
         function joinRoom() {
@@ -21,19 +36,7 @@
         function openRoom() {
             window.location.href = "new";
         }
-
     </script>
-    <main>
-        <button onclick="openRoom()">Open</button>
-        <button onclick="joinRoom()">Join</button>
-        <div id="room_list">
-            <p>room list</p>
-            <ul>
-            <% room_list.forEach(room => { %>
-                <a href="/join/<%= room %>"><%= room %></a>
-            <% }); %>
-            </ul>
-        </div>
-    </main>
 </body>
+
 </html>

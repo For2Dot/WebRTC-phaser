@@ -5,25 +5,28 @@
 <head>
   <meta charset="utf-8">
   <title>WebRTC Text Chat</title>
+  <link rel="shortcut icon" type="image/ico" href="../assets/images/favicon.ico"/>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+  <link rel="stylesheet" href="../styles/room.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-    }
-    #hahah {
+    #chat-panel {
       position: absolute;
     }
-    h1 {
+    #chat-panel h1 {
       color: aliceblue;
+    }
+    #chat-panel textarea {
+      background-color: #f0f8ffdd;
+      color: #000;
     }
   </style>
 </head>
 
 <body>
-  <div id="hahah">
+  <div id="chat-panel">
     <h1>WebRTC Text Chat</h1>
     <div>
       <textarea id="messages" rows="10" cols="50" disabled></textarea>
@@ -32,7 +35,11 @@
       <input type="text" id="message" size="50">
     </div>
   </div>
-  <div id="simple-game"></div>
+  <div id="simple-game">
+    <% if (isHost) { %>
+      <button id="start" disabled>start</button>
+    <% } %>
+  </div>
   <script>
     var isHost = "<%= isHost %>" === "true";
     var roomId = "<%= roomId %>";

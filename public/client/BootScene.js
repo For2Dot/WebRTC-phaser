@@ -5,7 +5,6 @@ import clientData from "./data.js";
 export default class BootScene extends Phaser.Scene {
 	constructor() {
 		super("BootScene");
-		this.keyState = {}
 	}
 
 	preload() {
@@ -29,13 +28,14 @@ export default class BootScene extends Phaser.Scene {
 		const mine = this.players.find(x => x.id === clientData.connId);
 		this.cameras.main.setBounds(0, 0, width * 2, height * 2);
 		this.cameras.main.startFollow(mine);
+
 	}
 
 	update() {
 		this.players.forEach(player => player.update());
 		this.input.keyboard.on('keydown', (event) => {
-			if (clientData.onKeyEvent !== null && this.keyState[event.key] != true) {
-				this.keyState[event.key] = true;
+			if (clientData.onKeyEvent !== null && clientData.keyState[event.key] != true) {
+				clientData.keyState[event.key] = true;
 				const keyData =
 					event.key === 'd' ? { inputId: 'right', state: true } :
 					event.key === 's' ? { inputId: 'down', state: true } :
@@ -46,8 +46,8 @@ export default class BootScene extends Phaser.Scene {
 			}
 		});
 		this.input.keyboard.on('keyup', (event) => {
-			if (clientData.onKeyEvent !== null && this.keyState[event.key] == true) {
-				this.keyState[event.key] = false;
+			if (clientData.onKeyEvent !== null && clientData.keyState[event.key] == true) {
+				clientData.keyState[event.key] = false;
 				const keyData =
 					event.key === 'd' ? { inputId: 'right', state: false } :
 					event.key === 's' ? { inputId: 'down', state: false } :

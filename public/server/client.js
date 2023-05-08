@@ -13,8 +13,21 @@ export default function activity(client) {
         client.send("keyPress", keyData);
     };
 
+    // if the browser tab focus is changed, send keyup event to server
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden" && clientData.isStarted == true) {
+            clientData.keyState = {};
+            client.send("keyPress", { inputId: "up", state: false });
+            client.send("keyPress", { inputId: "down", state: false });
+            client.send("keyPress", { inputId: "left", state: false });
+            client.send("keyPress", { inputId: "right", state: false });
+        }
+    });
+
+
     client.addEventListener("start", ({ connId, payload }) => {
         clientData.connId = connId;
+        clientData.isStarted = true;
         clientData.onStart();
     });
 

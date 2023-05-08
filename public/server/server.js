@@ -16,24 +16,35 @@ export default function activity(server) {
             players[player.connId] = player;
         }
     }
-    server.addConnListener((connId, state) => {
-        if (state === "connected") {
-            var player = new Player(connId);
-            playerArr.push(player)
-            if (playerArr.length < playerCnt)
-                return;
-            server.freezeRoom();
-            init();
-            setTimeout(() => {
-                server.broadcast("start", playerCnt);
-            }, 250);
-        }
-    });
+
     server.addEventListener("chat", ({ connId, payload }) => {
         server.broadcast("chat", { id: connId, chat: payload });
     });
 
-    server.addEventListener("keyPress", ({connId, payload}) => {
+    server.addConnListener((connId, state) => {
+        if (state === "connected") {
+            server.broadcast("chat", { id: connId, chat: "has joined." });
+            var player = new Player(connId);
+            playerArr.push(player)
+            if (playerArr.length < playerCnt)
+                return;
+            const startBtn = document.querySelector("#start");
+            startBtn.addEventListener("click", () => {
+                server.freezeRoom();
+                init();
+                setTimeout(() => {
+                    server.broadcast("start", playerCnt);
+                    server.broadcast("chat", { id: "System", chat: "game started!" });
+                }, 100);
+                // change startBtn's style to display:none
+                startBtn.style.display = "none";
+
+            });
+            startBtn.removeAttribute("disabled");
+        }
+    });
+
+    server.addEventListener("keyPress", ({ connId, payload }) => {
         if (payload.inputId === "right")
             players[connId].pressingRight = payload.state;
         if (payload.inputId === "down")
