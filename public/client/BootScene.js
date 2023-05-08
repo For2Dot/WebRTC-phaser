@@ -1,15 +1,15 @@
 import Player from "./player.js";
-import { client } from "../server/app.js";
 import clientData from "./data.js";
+import constant from "../constant.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
 		super("BootScene");
+		this.keyState = {};
 	}
 
 	preload() {
 		Player.prelodad(this);
-		// Ship.prelodad(this);
 	}
 
 	create() {
@@ -28,34 +28,33 @@ export default class BootScene extends Phaser.Scene {
 		const mine = this.players.find(x => x.id === clientData.connId);
 		this.cameras.main.setBounds(0, 0, width * 2, height * 2);
 		this.cameras.main.startFollow(mine);
-
 	}
 
 	update() {
 		this.players.forEach(player => player.update());
 		this.input.keyboard.on('keydown', (event) => {
-			if (clientData.onKeyEvent !== null && clientData.keyState[event.key] != true) {
-				clientData.keyState[event.key] = true;
-				const keyData =
-					event.key === 'd' ? { inputId: 'right', state: true } :
-					event.key === 's' ? { inputId: 'down', state: true } :
-					event.key === 'a' ? { inputId: 'left', state: true } :
-					event.key === 'w' ? { inputId: 'up', state: true } :
-					null;
-				clientData.onKeyEvent(keyData);
-			}
+			const key = event.key?.toLowerCase();
+			if (clientData.onKeyEvent === null)
+				return;
+			if (clientData.keyPressed[key] === true)
+				return;
+			clientData.keyPressed[key] = true;
+			const pressedKey = constant.keyMap.find(x => x.key === key);
+			if (pressedKey == null)
+				return;
+			clientData.onKeyEvent({ ...pressedKey, state: true });
 		});
 		this.input.keyboard.on('keyup', (event) => {
-			if (clientData.onKeyEvent !== null && clientData.keyState[event.key] == true) {
-				clientData.keyState[event.key] = false;
-				const keyData =
-					event.key === 'd' ? { inputId: 'right', state: false } :
-					event.key === 's' ? { inputId: 'down', state: false } :
-					event.key === 'a' ? { inputId: 'left', state: false } :
-					event.key === 'w' ? { inputId: 'up', state: false } :
-					null;
-				clientData.onKeyEvent(keyData);
-			}
+			const key = event.key?.toLowerCase();
+			if (clientData.onKeyEvent === null)
+				return;
+			if (clientData.keyPressed[key] === false)
+				return;
+			clientData.keyPressed[key] = false;
+			const pressedKey = constant.keyMap.find(x => x.key === key);
+			if (pressedKey == null)
+				return;
+			clientData.onKeyEvent({ ...pressedKey, state: false });
 		});
 	}
 }

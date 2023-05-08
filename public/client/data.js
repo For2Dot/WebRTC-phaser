@@ -6,7 +6,7 @@ const data = {
     onKeyEvent: null,
     onStart: null,
     connId: null,
-    keyState: {},
+    keyPressed: {},
     isStarted: false,
 };
 

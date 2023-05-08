@@ -23,18 +23,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 	}
 
 	update() {
-		const speed = 2.5;
-		let playerVelocity = new Phaser.Math.Vector2();
 		const player = clientData.players.find(x => x.id === this.id);
-		const dx = player.x - this.x;
-		const dy = player.y - this.y;
-
-		if (dx != 0 && Math.abs(dx) > 1)
-			playerVelocity.x = dx > 0 ? 1 : -1;
-		if (dy != 0 && Math.abs(dy) > 1)
-			playerVelocity.y = dy > 0 ? 1 : -1;
-		playerVelocity.normalize();
-		playerVelocity.scale(speed);
-		this.setVelocity(playerVelocity.x, playerVelocity.y);
+		this.setPosition(player.x, player.y)
 	}
 }

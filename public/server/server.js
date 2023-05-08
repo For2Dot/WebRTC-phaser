@@ -1,20 +1,43 @@
 import { Server } from "./webrtc.js";
+import constant from "../constant.js";
 
-const playerCnt = 2;
-const playerArr = [];
-const players = {};
+const data = {
+    /**
+     * @typedef {Object} PlayerInput
+     * @property {number} id
+     * @property {string} connId
+     * @property {Object<string, boolean>} key
+     */
+
+    /**
+     * @type {Object<string, PlayerInput>}
+     */
+    playerInput: {},
+    players: [],
+    objs: [],
+};
 
 /**
  * @param {Server} server 
  */
 export default function activity(server) {
+    const noGravity = { x: 0, y: 0, scale: 0 }
+    const engine = Matter.Engine.create({ gravity: noGravity });
+    const runner = Matter.Runner.create();
+
     const init = () => {
-        for (let idx = 0; idx < playerArr.length; idx++) {
-            const player = playerArr[idx];
-            player.y = 300;
-            player.x = idx * 25 + 100;
-            players[player.connId] = player;
-        }
+        data.players.forEach((player, idx) => {
+            const x = idx * 25 + 100;
+            const y = 300;
+            Matter.Body.setPosition(player, { x, y });
+            data.playerInput[player.connId] = {
+                id: player.id,
+                connId: player.connId,
+                key: {},
+            }
+        });
+        Matter.Composite.add(engine.world, data.players);
+        Matter.Runner.run(runner, engine);
     }
 
     server.addEventListener("chat", ({ connId, payload }) => {
@@ -24,16 +47,16 @@ export default function activity(server) {
     server.addConnListener((connId, state) => {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
-            var player = new Player(connId);
-            playerArr.push(player)
-            if (playerArr.length < playerCnt)
+            const player = Matter.Bodies.circle(0, 0, 10, { connId });
+            data.players.push(player);
+            if (data.players.length < constant.playerCnt)
                 return;
             const startBtn = document.querySelector("#start");
             startBtn.addEventListener("click", () => {
                 server.freezeRoom();
                 init();
                 setTimeout(() => {
-                    server.broadcast("start", playerCnt);
+                    server.broadcast("start", constant.playerCnt);
                     server.broadcast("chat", { id: "System", chat: "game started!" });
                 }, 100);
                 // change startBtn's style to display:none
@@ -45,51 +68,30 @@ export default function activity(server) {
     });
 
     server.addEventListener("keyPress", ({ connId, payload }) => {
-        if (payload.inputId === "right")
-            players[connId].pressingRight = payload.state;
-        if (payload.inputId === "down")
-            players[connId].pressingDown = payload.state;
-        if (payload.inputId === "left")
-            players[connId].pressingLeft = payload.state;
-        if (payload.inputId === "up")
-            players[connId].pressingUp = payload.state;
+        const key = constant.keyMap.find(x => x.inputId === payload.inputId);
+        if (key == null)
+            return;
+        data.playerInput[connId].key[key.inputId] = payload.state;
     });
 
-    setInterval(function () {
-        var pack = [];
-        for (var i in playerArr) {
-            var player = playerArr[i];
-            player.updatePosition();
-            pack.push({
-                id: player.connId,
-                x: player.x,
-                y: player.y,
-            });
-        }
-        server.broadcast("newPos", pack);
-    }, 33);
-}
+    Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
+        data.players.map(player => {
+            const isRight = data.playerInput[player.connId].key["right"];
+            const isLeft = data.playerInput[player.connId].key["left"];
+            const x = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
+            const isDown = data.playerInput[player.connId].key["down"];
+            const isUp = data.playerInput[player.connId].key["up"];
+            const y = (isDown ? 1 : 0) + (isUp ? -1 : 0);
+            const speed = data.playerInput[player.connId].key["sprint"] ? 2 : 1
+            Matter.Body.setVelocity(player, { x: x * speed, y: y * speed });
+        });
+    });
 
-
-class Player {
-    constructor(connId) {
-        this.connId = connId;
-        this.x = 0;
-        this.y = 0;
-        this.pressingRight = false;
-        this.pressingLeft = false;
-        this.pressingUp = false;
-        this.pressingDown = false;
-        this.maxSpd = 2.5;
-    }
-    updatePosition = function () {
-        if (this.pressingRight)
-            this.x += this.maxSpd;
-        if (this.pressingLeft)
-            this.x -= this.maxSpd;
-        if (this.pressingUp)
-            this.y -= this.maxSpd;
-        if (this.pressingDown)
-            this.y += this.maxSpd;
-    }
+    Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
+        server.broadcast("newPos", data.players.map(player => ({
+            id: player.connId,
+            x: player.position.x,
+            y: player.position.y,
+        })));
+    });
 }
