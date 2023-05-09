@@ -2,8 +2,9 @@ import clientData from "./data.js";
 
 export default class Player extends Phaser.Physics.Matter.Sprite {
 	constructor(data) {
-		let { scene, x, y, texture, frame, id } = data;
+		let { scene, x, y, texture, frame, id, connId } = data;
 		super(scene.matter.world, x, y, texture, frame);
+		this.connId = connId;
 		this.id = id;
 		this.scene.add.existing(this);
 

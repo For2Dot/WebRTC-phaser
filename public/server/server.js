@@ -1,21 +1,80 @@
 import { Server } from "./webrtc.js";
-import constant from "../constant.js";
+import { constant, input } from "../constant.js";
 
 const data = {
     /**
-     * @typedef {Object} PlayerInput
-     * @property {number} id
-     * @property {string} connId
-     * @property {Object<string, boolean>} key
+     * @type {Object<string, Player>}
      */
+    playerMapByConnId: {},
+    /**
+     * The elements in this array are automatically managed.
+     * @type {Array<Player>}
+     */
+    players: [],
+    /**
+     * The elements in this array are automatically managed.
+     * @type {Array<Entity>}
+     */
+    entities: [],
+};
+
+class Entity {
+    /**
+     * @param {Matter.Body} body 
+     */
+    constructor(body) {
+        /**
+         * @type {Matter.Body}
+         */
+        this.body = body;
+        data.entities.push(this);
+    }
 
     /**
-     * @type {Object<string, PlayerInput>}
+     * @param {number} delta
      */
-    playerInput: {},
-    players: [],
-    objs: [],
-};
+    update(delta) { }
+
+    /**
+     * 
+     */
+    toDTO() {
+        return {
+            id: this.body.id,
+            x: this.body.position.x,
+            y: this.body.position.y,
+        }
+    }
+}
+
+class Player extends Entity {
+    constructor(connId, x = 0, y = 0) {
+        super(Matter.Bodies.circle(x, y, 10));
+        this.connId = connId;
+        this.speed = 50;
+        this.key = {};
+        data.players.push(this);
+        data.playerMapByConnId[connId] = this;
+    }
+    update(delta) {
+        const isRight = this.key[input.RIGHT];
+        const isLeft = this.key[input.LEFT];
+        const isDown = this.key[input.DOWN];
+        const isUp = this.key[input.UP];
+        const sprint = this.key[input.SPRINT] ? 2 : 1
+        const dx = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
+        const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
+        const x = dx * sprint * delta * this.speed;
+        const y = dy * sprint * delta * this.speed
+        Matter.Body.setVelocity(this.body, { x, y });
+    }
+    toDTO() {
+        return {
+            ...super.toDTO(),
+            connId: this.connId,
+        }
+    }
+}
 
 /**
  * @param {Server} server 
@@ -29,14 +88,9 @@ export default function activity(server) {
         data.players.forEach((player, idx) => {
             const x = idx * 25 + 100;
             const y = 300;
-            Matter.Body.setPosition(player, { x, y });
-            data.playerInput[player.connId] = {
-                id: player.id,
-                connId: player.connId,
-                key: {},
-            }
+            Matter.Body.setPosition(player.body, { x, y });
         });
-        Matter.Composite.add(engine.world, data.players);
+        Matter.Composite.add(engine.world, data.players.map(x => x.body));
         Matter.Runner.run(runner, engine);
     }
 
@@ -47,8 +101,7 @@ export default function activity(server) {
     server.addConnListener((connId, state) => {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
-            const player = Matter.Bodies.circle(0, 0, 10, { connId });
-            data.players.push(player);
+            const player = new Player(connId, 0, 0);
             if (data.players.length < constant.playerCnt)
                 return;
             const startBtn = document.querySelector("#start");
@@ -71,27 +124,15 @@ export default function activity(server) {
         const key = constant.keyMap.find(x => x.inputId === payload.inputId);
         if (key == null)
             return;
-        data.playerInput[connId].key[key.inputId] = payload.state;
+        data.playerMapByConnId[connId].key[key.inputId] = payload.state;
     });
 
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
-        data.players.map(player => {
-            const isRight = data.playerInput[player.connId].key["right"];
-            const isLeft = data.playerInput[player.connId].key["left"];
-            const x = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
-            const isDown = data.playerInput[player.connId].key["down"];
-            const isUp = data.playerInput[player.connId].key["up"];
-            const y = (isDown ? 1 : 0) + (isUp ? -1 : 0);
-            const speed = data.playerInput[player.connId].key["sprint"] ? 2 : 1
-            Matter.Body.setVelocity(player, { x: x * speed, y: y * speed });
-        });
+        const delta = source.delta * 0.001;
+        data.entities.forEach((entity) => entity.update(delta));
     });
 
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        server.broadcast("newPos", data.players.map(player => ({
-            id: player.connId,
-            x: player.position.x,
-            y: player.position.y,
-        })));
+        server.broadcast("newPos", data.players.map(player => player.toDTO()));
     });
 }

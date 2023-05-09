@@ -1,6 +1,6 @@
 import Player from "./player.js";
 import clientData from "./data.js";
-import constant from "../constant.js";
+import { constant } from "../constant.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -23,9 +23,10 @@ export default class BootScene extends Phaser.Scene {
 				texture: 'female',
 				frame: 'townsfolk_f_idle_1',
 				id: player.id,
+				connId: player.connId,
 			});
 		});
-		const mine = this.players.find(x => x.id === clientData.connId);
+		const mine = this.players.find(x => x.connId === clientData.connId);
 		this.cameras.main.setBounds(0, 0, width * 2, height * 2);
 		this.cameras.main.startFollow(mine);
 	}

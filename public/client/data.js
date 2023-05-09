@@ -1,6 +1,6 @@
 const data = {
     /**
-     * @type {Array<{id:string, x:number, y:number}>}
+     * @type {Array<{id:number, connId:string, x:number, y:number}>}
      */
     players: [],
     onKeyEvent: null,

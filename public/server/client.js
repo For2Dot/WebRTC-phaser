@@ -1,6 +1,6 @@
 import { Client } from "./webrtc.js";
 import clientData from "./../client/data.js";
-import constant from "../constant.js";
+import { constant } from "../constant.js";
 
 
 const chats = [];
