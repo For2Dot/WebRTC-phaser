@@ -1,4 +1,4 @@
-import { serverData } from "../server.js";
+import { entityType } from "../../constant.js";
 
 export class Entity {
     /**
@@ -9,7 +9,8 @@ export class Entity {
          * @type {Matter.Body}
          */
         this.body = body;
-        serverData.entities.push(this);
+        this.entityType = entityType.ENTITY;
+        this.appendToEngine = true;
     }
 
     /**
@@ -20,6 +21,7 @@ export class Entity {
 
     toDTO() {
         return {
+            type: this.entityType,
             id: this.body.id,
             x: this.body.position.x,
             y: this.body.position.y,

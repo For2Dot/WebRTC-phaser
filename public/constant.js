@@ -6,6 +6,11 @@ export const input = {
     SPRINT: "sprint",
 }
 
+export const entityType = {
+    ENTITY: "entity",
+    PLAYER: "player",
+}
+
 export const constant = {
     playerCnt: 2,
     keyMap: [

@@ -1,38 +1,54 @@
 import Player from "./player.js";
-import clientData from "./data.js";
-import { constant } from "../constant.js";
+import { clientData } from "./client.js";
+import { constant, entityType } from "../constant.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
 		super("BootScene");
 		this.keyState = {};
+		this.images = {};
 	}
 
 	preload() {
 		Player.prelodad(this);
+		this.load.image("ship", "../assets/images/ship.png")
 	}
 
 	create() {
-		let { width, height } = this.game.canvas;
-
-		this.players = clientData.players.map(player => {
-			return new Player({
-				scene: this,
-				x: player.x,
-				y: player.y,
-				texture: 'female',
-				frame: 'townsfolk_f_idle_1',
-				id: player.id,
-				connId: player.connId,
-			});
-		});
-		const mine = this.players.find(x => x.connId === clientData.connId);
-		this.cameras.main.setBounds(0, 0, width * 2, height * 2);
-		this.cameras.main.startFollow(mine);
+		const cameraFollowPlayer = () => {
+			const playerEntity = clientData.entities.find(x => x.connId == clientData.connId);
+			const mine = this.images[playerEntity?.id];
+			if (mine != null) {
+				const { width, height } = this.game.canvas;
+				this.mine = mine;
+				this.cameras.main.setBounds(0, 0, width * 2, height * 2);
+				this.cameras.main.startFollow(this.mine);
+			} else {
+				setTimeout(cameraFollowPlayer, 1000);
+			}
+		}
+		cameraFollowPlayer();
 	}
 
 	update() {
-		this.players.forEach(player => player.update());
+		for (const id in this.images) {
+			if (clientData.entities.find(x => x.id == id) == null) {
+				this.images[id].destroy();
+				delete this.images[id];
+			}
+		}
+		clientData.entities.map(entity => {
+			let image = this.images[entity.id];
+			if (image == null) {
+				if (entity.type == entityType.PLAYER)
+					image = new Phaser.GameObjects.Image(this, entity.x, entity.y, "female", "townsfolk_f_idle_1");
+				if (entity.type == entityType.ENTITY)
+					image = new Phaser.GameObjects.Image(this, entity.x, entity.y, "ship");
+				this.images[entity.id] = image;
+				this.add.existing(image);
+			}
+			image.setPosition(entity.x, entity.y);
+		});
 		this.input.keyboard.on('keydown', (event) => {
 			const key = event.key?.toLowerCase();
 			if (clientData.onKeyEvent === null)

@@ -1,5 +1,5 @@
 import BootScene from "./BootScene.js";
-import clientData from "./data.js";
+import { clientData } from "./client.js";
 
 const config = {
 	width: window.innerWidth,
@@ -10,22 +10,6 @@ const config = {
 	scene: [BootScene],
 	scale: {
 		zoom: 2,
-	},
-	physics: {
-		default: 'matter',
-		matter: {
-			debug: true,
-			gravity: {y: 0},
-		}
-	},
-	plugins: {
-		scene: [
-			{
-				plugin: PhaserMatterCollisionPlugin,
-				key: 'matterCollision',
-				mapping: 'matterCollision'
-			}
-		]
 	}
 }
 clientData.onStart = () => {

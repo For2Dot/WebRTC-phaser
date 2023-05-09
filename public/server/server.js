@@ -1,7 +1,8 @@
 import { Server } from "./webrtc.js";
-import { constant } from "../constant.js";
+import { constant, entityType } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
+import { TestBall } from "./entity/testBall.js";
 
 export const serverData = {
     /**
@@ -28,7 +29,29 @@ export default function activity(server) {
     const engine = Matter.Engine.create({ gravity: noGravity });
     const runner = Matter.Runner.create();
 
+    /**
+     * @param {Entity} entity 
+     */
+    const addEntity = (entity) => {
+        serverData.entities.push(entity);
+        if (entity.entityType == entityType.PLAYER) {
+            serverData.players.push(entity);
+            serverData.playerMapByConnId[entity.connId] = entity;
+        }
+        if (entity.appendToEngine)
+            Matter.Composite.add(engine.world, entity.body);
+    }
+
+    const removeEntity = (entity) => {
+        // TODO
+    }
+
     const init = () => {
+
+        // for test
+        for (let i = 0; i < 300; i++) addEntity(new TestBall());
+
+
         serverData.players.forEach((player, idx) => {
             const x = idx * 25 + 100;
             const y = 300;
@@ -45,7 +68,7 @@ export default function activity(server) {
     server.addConnListener((connId, state) => {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
-            const player = new Player(connId, 0, 0);
+            addEntity(new Player(connId, 0, 0));
             if (serverData.players.length < constant.playerCnt)
                 return;
             const startBtn = document.querySelector("#start");
@@ -77,6 +100,6 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        server.broadcast("newPos", serverData.players.map(player => player.toDTO()));
+        server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
     });
 }

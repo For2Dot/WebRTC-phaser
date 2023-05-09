@@ -1,6 +1,6 @@
 import { Server, Client } from "./webrtc.js"
 import serverActivity from "./server.js"
-import clientActivity from "./client.js"
+import clientActivity from "../client/client.js"
 
 const server = new Server();
 async function startServer() {

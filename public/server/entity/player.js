@@ -1,15 +1,13 @@
-import { serverData } from "../server.js";
 import { Entity } from "./entity.js";
-import { input } from "../../constant.js";
+import { input, entityType } from "../../constant.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0) {
         super(Matter.Bodies.circle(x, y, 10));
+        this.entityType = entityType.PLAYER;
         this.connId = connId;
         this.speed = 50;
         this.key = {};
-        serverData.players.push(this);
-        serverData.playerMapByConnId[connId] = this;
     }
 
     update(delta) {
@@ -28,6 +26,7 @@ export class Player extends Entity {
     toDTO() {
         return {
             ...super.toDTO(),
+            type: this.entityType,
             connId: this.connId,
         }
     }

@@ -1,7 +1,15 @@
-import { Client } from "./webrtc.js";
-import clientData from "./../client/data.js";
+import { Client } from "../server/webrtc.js";
 import { constant } from "../constant.js";
 
+export const clientData = {
+    players: [],
+    entities: [],
+    onKeyEvent: null,
+    onStart: null,
+    connId: null,
+    keyPressed: {},
+    isStarted: false,
+};
 
 const chats = [];
 /**
@@ -30,8 +38,8 @@ export default function activity(client) {
         clientData.onStart();
     });
 
-    client.addEventListener("newPos", ({ connId, payload }) => {
-        clientData.players = payload;
+    client.addEventListener("frame", ({ connId, payload }) => {
+        clientData.entities = payload;
     });
 
     client.addEventListener("chat", ({ connId, payload }) => {
