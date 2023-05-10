@@ -1,4 +1,4 @@
-import Player from "./player.js";
+import Player from "./entity/player.js";
 import { clientData } from "./client.js";
 import { constant, entityType } from "../constant.js";
 
