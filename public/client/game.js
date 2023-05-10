@@ -12,7 +12,10 @@ const config = {
 		zoom: 2,
 	}
 }
-clientData.onStart = () => {
-	console.log('Starting game');
-	new Phaser.Game(config);
-};
+const game = new Phaser.Game(config);
+const findScene = setInterval(() => {
+	clientData.scene = game.scene.getScenes()[0];
+	if (clientData.scene != null)
+		clearInterval(findScene);
+}, 1);
+clientData.scene = game.scene.getScenes()[0];

@@ -9,10 +9,11 @@ export const input = {
 export const entityType = {
     ENTITY: "entity",
     PLAYER: "player",
+    TESTBALL: "testBall",
 }
 
 export const constant = {
-    playerCnt: 2,
+    playerCnt: 1,
     keyMap: [
         { key: "w", inputId: input.UP },
         { key: "a", inputId: input.LEFT },

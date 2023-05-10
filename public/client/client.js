@@ -1,15 +1,51 @@
 import { Client } from "../server/webrtc.js";
-import { constant } from "../constant.js";
+import { constant, entityType } from "../constant.js";
+import Entity from "./entity/entity.js";
+import Player from "./entity/player.js";
+import TestBall from "./entity/testBall.js"
 
 export const clientData = {
     players: [],
-    entities: [],
+    /**
+     * @type {Object<number, Entity>}
+     */
+    entities: {},
     onKeyEvent: null,
-    onStart: null,
     connId: null,
     keyPressed: {},
     isStarted: false,
+    /**
+     * @type {Phaser.Scene}
+     */
+    scene: null,
 };
+
+/**
+ * @param {Entity} entity 
+ */
+export const addEntity = (entity) => {
+    clientData.entities[entity.meta.id] = entity;
+    clientData.scene.add.existing(entity.gameObject);
+}
+
+export const removeEntity = (entity) => {
+    delete clientData.entities[entity.meta.id];
+    entity.destroy(true, true);
+}
+
+export const createEntity = (meta) => {
+    let entity = null;
+    if (meta == null || meta.type == null)
+        throw new Error("meta is not defined");
+    else if (meta.type == entityType.PLAYER)
+        entity = new Player();
+    else if (meta.type == entityType.TESTBALL)
+        entity = new TestBall();
+    else
+        throw new Error("entity type is not defined");
+    entity.meta = meta;
+    return entity;
+}
 
 const chats = [];
 /**
@@ -35,11 +71,26 @@ export default function activity(client) {
     client.addEventListener("start", ({ connId, payload }) => {
         clientData.connId = connId;
         clientData.isStarted = true;
-        clientData.onStart();
+        client.send("start")
     });
 
     client.addEventListener("frame", ({ connId, payload }) => {
-        clientData.entities = payload;
+        const rawEntities = payload.reduce((acc, cur) => {
+            acc[cur.id] = cur;
+            return acc;
+        }, {});
+        // for (const id in clientData.entities) {
+        //     if (rawEntities[id] == null) {
+        //         console.log("remove", id);
+        //         removeEntity(clientData.entities[id]);
+        //     }
+        // }
+        for (const id in rawEntities) {
+            if (clientData.entities[id] == null) {
+                addEntity(createEntity(rawEntities[id]));
+            }
+            clientData.entities[id].setMeta(rawEntities[id]);
+        }
     });
 
     client.addEventListener("chat", ({ connId, payload }) => {
