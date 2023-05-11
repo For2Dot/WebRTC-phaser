@@ -1,4 +1,4 @@
-import { entityType } from "../../constant.js";
+import { constant, entityType } from "../../constant.js";
 import { clientData } from "../client.js";
 
 export default class Entity {
@@ -29,6 +29,13 @@ export default class Entity {
     }
 
     update() {
-        this.setPosition(this.meta.x, this.meta.y);
+        let { x, y } = this.meta;
+        if (this.x != null && this.y != null) {
+            x = (x * constant.clientLerp + this.x * (1 - constant.clientLerp));
+            y = (y * constant.clientLerp + this.y * (1 - constant.clientLerp));
+        }
+        this.x = x;
+        this.y = y;
+        this.setPosition(x, y);
     }
 }

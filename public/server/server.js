@@ -28,7 +28,6 @@ export default function activity(server) {
     const noGravity = { x: 0, y: 0, scale: 0 }
     const engine = Matter.Engine.create({ gravity: noGravity });
     const runner = Matter.Runner.create();
-    runner.delta = 1000 / 30;
 
     /**
      * @param {Entity} entity 
