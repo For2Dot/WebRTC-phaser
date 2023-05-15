@@ -21,7 +21,7 @@ class Network {
         this.isHost = false;
         this.dataSendPerSec = 0;
         this.dataRecvPerSec = 0;
-        
+
 
         /**
          * @type {Object<string, Array<dataListener>>}
@@ -117,7 +117,8 @@ class Network {
         const connection = this.connections.find(x => x.connId === connId);
         if (connection == null)
             throw new Error("Connection not found");
-            this.dataSendPerSec += connection.send(this.#packPayload(connId, type, payload));
+        this.dataSendPerSec += this.#packPayload(connId, type, payload).length;
+        connection.send(this.#packPayload(connId, type, payload));
     }
 
     /**
@@ -126,8 +127,10 @@ class Network {
      */
     broadcase(type, payload) {
         this.connections.forEach(x => {
-            if (x.channel.readyState === "open")
-                this.dataSendPerSec += x.send(this.#packPayload(x.connId, type, payload));
+            if (x.channel.readyState === "open") {
+                this.dataSendPerSec += this.#packPayload(x.connId, type, payload).length;
+                x.send(this.#packPayload(x.connId, type, payload));
+            }
         });
     }
 
@@ -233,8 +236,19 @@ class Connection {
      * @param {string} msg 
      */
     send(msg) {
-        this.channel.send(msg);
-        return new Blob([msg]).size;
+        var chunkSize = 65535
+        while (msg.length > 0) {
+            if (this.channel.bufferedAmount > this.channel.bufferedAmountLowThreshold) {
+                this.channel.onbufferedamountlow = () => {
+                    this.channel.onbufferedamountlow = null;
+                    this.send(msg);
+                };
+                return;
+            }
+            const chunk = msg.slice(0, chunkSize);
+            msg = msg.slice(chunkSize, msg.length);
+            this.channel.send(chunk);
+        }
     }
 
     /**
