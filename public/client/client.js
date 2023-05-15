@@ -103,6 +103,18 @@ export default function activity(client) {
     document.getElementById("message").addEventListener("input", (x) => {
         client.send("chat", x.currentTarget.value);
     });
+
+    let ping_ms = 0;
+
+    client.addEventListener("pong", ({ connId, payload }) => {
+        let elapsed_time = Date.now() - ping_ms;
+        document.getElementById("ping").innerText = `ping: ${elapsed_time}ms`;
+    });
+
+    setInterval(() => {
+        ping_ms = Date.now();
+        client.send("ping");
+    }, 1000);
 }
 
 function render() {

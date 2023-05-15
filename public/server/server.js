@@ -49,8 +49,7 @@ export default function activity(server) {
     const init = () => {
 
         // for test
-        for (let i = 0; i < 300; i++) addEntity(new TestBall());
-
+        for (let i = 0; i < 100; i++) addEntity(new TestBall());
 
         serverData.players.forEach((player, idx) => {
             const x = idx * 25 + 100;
@@ -63,6 +62,11 @@ export default function activity(server) {
 
     server.addEventListener("chat", ({ connId, payload }) => {
         server.broadcast("chat", { id: connId, chat: payload });
+    });
+
+
+    server.addEventListener("ping", ({ connId, payload }) => {
+        server.send(connId, "pong", { id: connId });
     });
 
     server.addConnListener((connId, state) => {
@@ -79,7 +83,6 @@ export default function activity(server) {
                     server.broadcast("start", constant.playerCnt);
                     server.broadcast("chat", { id: "System", chat: "game started!" });
                 }, 100);
-                // change startBtn's style to display:none
                 startBtn.style.display = "none";
 
             });
