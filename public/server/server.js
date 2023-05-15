@@ -65,6 +65,11 @@ export default function activity(server) {
         server.broadcast("chat", { id: connId, chat: payload });
     });
 
+
+    server.addEventListener("ping", ({ connId, payload }) => {
+        server.send(connId, "pong", { id: connId, chat: payload });
+    });
+
     server.addConnListener((connId, state) => {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
@@ -79,7 +84,6 @@ export default function activity(server) {
                     server.broadcast("start", constant.playerCnt);
                     server.broadcast("chat", { id: "System", chat: "game started!" });
                 }, 100);
-                // change startBtn's style to display:none
                 startBtn.style.display = "none";
 
             });

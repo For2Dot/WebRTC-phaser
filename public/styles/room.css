@@ -17,3 +17,43 @@ body {
     left: calc(50% - 100px);
     top: calc(40%);
 }
+
+#chat-panel {
+    position: absolute;
+    width: 400px;
+    resize: both;
+    align-items: stretch; 
+}
+
+#chat-panel h1 {
+    color: aliceblue;
+    margin-left: 0.2em;
+}
+
+#chat-panel #messages {
+    background-color: #f0f8ffdd;
+    color: #000;
+    font-size: 1em;
+    width: 100%;
+    height: 10em;
+    overflow-y: scroll;
+    resize: none;
+}
+
+#chat-panel #message {
+    background-color: #f0f8ffdd;
+    color: #000;
+    width: 100%;
+}
+
+#status-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; /* 좌우 정렬 */
+    align-items: flex-end; /* 하단 정렬 */
+}
+
+#ping {
+    color: azure;
+    margin-left: auto; /* 오른쪽 정렬 */
+}

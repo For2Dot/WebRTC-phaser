@@ -21,7 +21,8 @@ class Network {
          */
         this.eventListeners = {};
         this._eventListener = (msg) => {
-            const data = this.#unpackPayload(msg)
+            const data = this.#unpackPayload(msg);
+            this.#calculateData(data);
             for (const listenerType in this.eventListeners) {
                 const listeners = this.eventListeners[listenerType];
                 if (listenerType === data.type)
@@ -158,6 +159,13 @@ class Network {
         connection.setListener(this._eventListener);
         this.connections.push(connection);
         return connection;
+    }
+
+    #calculateData(data) {
+        // 1. data length
+        // 2. whose data?
+        // 3. data type
+        
     }
 }
 
@@ -376,3 +384,4 @@ export class Client extends Node {
         this.net.send(connId, type, payload);
     }
 }
+
