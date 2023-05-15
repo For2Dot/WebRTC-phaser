@@ -1,3 +1,6 @@
+const doc_data_flow_send = document.querySelector(`#data-flow-send`);
+const doc_data_flow_recv = document.querySelector(`#data-flow-recv`);
+
 class Network {
     /**
      * @callback createRoomCallback
@@ -16,13 +19,17 @@ class Network {
         this.socket = io();
         this.roomId = null;
         this.isHost = false;
+        this.dataSendPerSec = 0;
+        this.dataRecvPerSec = 0;
+        
+
         /**
          * @type {Object<string, Array<dataListener>>}
          */
         this.eventListeners = {};
         this._eventListener = (msg) => {
+            this.dataRecvPerSec += new Blob([msg]).size;
             const data = this.#unpackPayload(msg);
-            this.#calculateData(data);
             for (const listenerType in this.eventListeners) {
                 const listeners = this.eventListeners[listenerType];
                 if (listenerType === data.type)
@@ -57,6 +64,13 @@ class Network {
                 return; // TODO: error handling
             connection.conn.addIceCandidate(candidate);
         });
+
+        setInterval(() => {
+            doc_data_flow_send.innerText = `⬆️ ${(this.dataSendPerSec / 1024).toFixed(2)}kb/s`;
+            doc_data_flow_recv.innerText = `⬇️ ${(this.dataRecvPerSec / 1024).toFixed(2)}kb/s`;
+            this.dataSendPerSec = 0;
+            this.dataRecvPerSec = 0;
+        }, 1000);
     }
 
     /**
@@ -103,7 +117,7 @@ class Network {
         const connection = this.connections.find(x => x.connId === connId);
         if (connection == null)
             throw new Error("Connection not found");
-        connection.send(this.#packPayload(connId, type, payload));
+            this.dataSendPerSec += connection.send(this.#packPayload(connId, type, payload));
     }
 
     /**
@@ -113,7 +127,7 @@ class Network {
     broadcase(type, payload) {
         this.connections.forEach(x => {
             if (x.channel.readyState === "open")
-                x.send(this.#packPayload(x.connId, type, payload));
+                this.dataSendPerSec += x.send(this.#packPayload(x.connId, type, payload));
         });
     }
 
@@ -159,13 +173,6 @@ class Network {
         connection.setListener(this._eventListener);
         this.connections.push(connection);
         return connection;
-    }
-
-    #calculateData(data) {
-        // 1. data length
-        // 2. whose data?
-        // 3. data type
-        
     }
 }
 
@@ -227,6 +234,7 @@ class Connection {
      */
     send(msg) {
         this.channel.send(msg);
+        return new Blob([msg]).size;
     }
 
     /**
@@ -384,4 +392,3 @@ export class Client extends Node {
         this.net.send(connId, type, payload);
     }
 }
-

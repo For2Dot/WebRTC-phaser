@@ -55,5 +55,18 @@ body {
 
 #ping {
     color: azure;
-    margin-left: auto; /* 오른쪽 정렬 */
+    /* margin-left: auto; 오른쪽 정렬 */
+}
+
+#data-flow-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 하단 정렬 */
+    width: 130px;
+    border: #000 solid 1px;
+}
+
+#data-flow-panel span {
+    color: azure;
+    /* margin-left: auto; 오른쪽 정렬 */
 }

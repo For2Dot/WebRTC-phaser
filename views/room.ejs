@@ -15,7 +15,14 @@
 
 <body>
   <div id="chat-panel">
-    <div id="status-panel" ><h1>For2Dot</h1><span id="ping"></span></div>
+    <div id="status-panel">
+      <h1>For2Dot</h1>
+      <span id="ping"></span>
+      <div id="data-flow-panel">
+        <span id="data-flow-send"></span>
+        <span id="data-flow-recv"></span>
+      </div>
+    </div>
     <div>
       <textarea id="messages" disabled></textarea>
     </div>
@@ -26,7 +33,7 @@
   <div id="simple-game">
     <% if (isHost) { %>
       <button id="start" disabled>start</button>
-    <% } %>
+      <% } %>
   </div>
   <script>
     var isHost = "<%= isHost %>" === "true";
