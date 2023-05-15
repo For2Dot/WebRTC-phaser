@@ -3,6 +3,13 @@ import { constant, entityType } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
 import { TestBall } from "./entity/testBall.js";
+import { Wall} from "./entity/wall.js";
+
+const tiles = await fetch("/assets/images/testmap.json")
+    .then(x => x.json());
+console.log(tiles);
+
+let test_map = [[1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1]];
 
 export const serverData = {
     /**
@@ -50,7 +57,18 @@ export default function activity(server) {
     const init = () => {
 
         // for test
-        for (let i = 0; i < 100; i++) addEntity(new TestBall());
+        // for (let i = 0; i < 300; i++) addEntity(new TestBall());
+        const targetLayer = tiles.layers[1]; 
+        console.log(targetLayer);
+        const { width, height } = targetLayer;
+        for (let y = 0; y < height; ++y){
+            for (let x = 0; x < width; ++x){
+                const tileId = targetLayer.data[x + y * width];
+                if (tileId !== 0)
+                    addEntity(new Wall(x*16 + 210, y*16 + 210, tileId));
+            }
+        }
+
 
         serverData.players.forEach((player, idx) => {
             const x = idx * 25 + 100;

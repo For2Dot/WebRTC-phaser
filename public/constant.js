@@ -10,6 +10,7 @@ export const entityType = {
     ENTITY: "entity",
     PLAYER: "player",
     TESTBALL: "testBall",
+    WALL: "wall",
 }
 
 export const constant = {

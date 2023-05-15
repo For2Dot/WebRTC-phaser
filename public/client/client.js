@@ -2,7 +2,8 @@ import { Client } from "../server/webrtc.js";
 import { constant, entityType } from "../constant.js";
 import Entity from "./entity/entity.js";
 import Player from "./entity/player.js";
-import TestBall from "./entity/testBall.js"
+import TestBall from "./entity/testBall.js";
+import Wall from "./entity/wall.js";
 
 export const clientData = {
     players: [],
@@ -45,12 +46,13 @@ export const createEntity = (meta) => {
     if (meta == null || meta.type == null)
         throw new Error("meta is not defined");
     else if (meta.type == entityType.PLAYER)
-        entity = new Player();
+        entity = new Player(meta);
     else if (meta.type == entityType.TESTBALL)
-        entity = new TestBall();
+        entity = new TestBall(meta);
+    else if (meta.type == entityType.WALL)
+        entity = new Wall(meta);
     else
         throw new Error("entity type is not defined");
-    entity.meta = meta;
     return entity;
 }
 

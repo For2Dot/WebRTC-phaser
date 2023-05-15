@@ -3,8 +3,8 @@ import { entityType } from "../../constant.js";
 import { clientData } from "../client.js";
 
 export default class Player extends Entity {
-	constructor() {
-		super();
+	constructor(meta) {
+		super(meta);
 		this.entityType = entityType.PLAYER;
 		this.images = [
 			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "female", "townsfolk_f_idle_1"),
