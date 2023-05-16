@@ -9,34 +9,34 @@ const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
 console.log(tiles);
 
-let test_map = [[1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1]];
 
 export const serverData = {
     /**
      * @type {Object<string, Player>}
-     */
-    playerMapByConnId: {},
-    /**
-     * The elements in this array are automatically managed.
-     * @type {Array<Player>}
-     */
-    players: [],
-    /**
-     * The elements in this array are automatically managed.
-     * @type {Array<Entity>}
-     */
-    entities: [],
+    */
+   playerMapByConnId: {},
+   /**
+    * The elements in this array are automatically managed.
+    * @type {Array<Player>}
+   */
+  players: [],
+  /**
+   * The elements in this array are automatically managed.
+   * @type {Array<Entity>}
+  */
+ entities: [],
 };
 
 /**
  * @param {Server} server 
- */
+*/
 export default function activity(server) {
     const noGravity = { x: 0, y: 0, scale: 0 }
     const engine = Matter.Engine.create({ gravity: noGravity });
     const runner = Matter.Runner.create();
     const lastPing = {};
-
+    let updateCounter = 0;
+    
     /**
      * @param {Entity} entity 
      */
@@ -129,6 +129,15 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
+        if (updateCounter === 0){
+            server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
+            console.log("TEST COUNT");
+            ++updateCounter;
+        }
+        else{
+            server.broadcast("frame", serverData.entities
+                .filter(x => x.isStatic === false)
+                .map(x => x.toDTO()));
+        }
     });
 }
