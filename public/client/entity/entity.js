@@ -13,7 +13,9 @@ export default class Entity {
         return this.gameObject;
     }
 
-    destroy() { }
+    destroy() {
+        this.gameObject.destroy(true, true);
+    }
 
     setMeta(meta) {
         this.beforeMeta = this.meta;
