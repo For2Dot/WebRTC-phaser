@@ -24,13 +24,20 @@ export const clientData = {
  * @param {Entity} entity 
  */
 export const addEntity = (entity) => {
+    if (entity.entityType === entityType.PLAYER)
+        clientData.players.push(entity);
     clientData.entities[entity.meta.id] = entity;
     clientData.scene.add.existing(entity.gameObject);
 }
 
+/**
+ * @param {Entity} entity 
+ */
 export const removeEntity = (entity) => {
+    if (entity.entityType === entityType.PLAYER)
+        clientData.players = clientData.players.filter(x => x.id === entity.id);
     delete clientData.entities[entity.meta.id];
-    entity.destroy(true, true);
+    entity.destroy();
 }
 
 export const createEntity = (meta) => {
@@ -79,12 +86,12 @@ export default function activity(client) {
             acc[cur.id] = cur;
             return acc;
         }, {});
-        // for (const id in clientData.entities) {
-        //     if (rawEntities[id] == null) {
-        //         console.log("remove", id);
-        //         removeEntity(clientData.entities[id]);
-        //     }
-        // }
+        for (const id in clientData.entities) {
+            if (rawEntities[id] == null) {
+                console.log("remove", id);
+                removeEntity(clientData.entities[id]);
+            }
+        }
         for (const id in rawEntities) {
             if (clientData.entities[id] == null) {
                 addEntity(createEntity(rawEntities[id]));
