@@ -7,8 +7,6 @@ import { Wall} from "./entity/wall.js";
 
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
-console.log(tiles);
-
 
 export const serverData = {
     /**
@@ -56,16 +54,13 @@ export default function activity(server) {
 
     const init = () => {
 
-        // for test
-        // for (let i = 0; i < 300; i++) addEntity(new TestBall());
         const targetLayer = tiles.layers[1]; 
-        console.log(targetLayer);
         const { width, height } = targetLayer;
         for (let y = 0; y < height; ++y){
             for (let x = 0; x < width; ++x){
                 const tileId = targetLayer.data[x + y * width];
                 if (tileId !== 0)
-                    addEntity(new Wall(x*16 + 210, y*16 + 210, tileId));
+                    addEntity(new Wall(x * constant.blockCenter, y * constant.blockCenter, tileId));
             }
         }
 

@@ -22,5 +22,7 @@ export const constant = {
         { key: "s", inputId: input.DOWN },
         { key: "d", inputId: input.RIGHT },
         { key: "shift", inputId: input.SPRINT },
-    ]
+    ],
+    blockPixel: 32,
+    blockCenter: 16,
 }
