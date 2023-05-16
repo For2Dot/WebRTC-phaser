@@ -89,8 +89,7 @@ export default function activity(client) {
             return acc;
         }, {});
         for (const id in clientData.entities) {
-            if (rawEntities[id] == null) {
-                console.log("remove", id);
+            if (rawEntities[id] == null && clientData.entities[id].meta.isStatic == false) {
                 removeEntity(clientData.entities[id]);
             }
         }

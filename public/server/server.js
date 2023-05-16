@@ -131,7 +131,6 @@ export default function activity(server) {
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
         if (updateCounter === 0){
             server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
-            console.log("TEST COUNT");
             ++updateCounter;
         }
         else{
