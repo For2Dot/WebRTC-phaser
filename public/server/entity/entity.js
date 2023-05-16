@@ -11,6 +11,7 @@ export class Entity {
         this.body = body;
         this.entityType = entityType.ENTITY;
         this.appendToEngine = true;
+        this.isStatic = false;
     }
 
     /**
@@ -25,6 +26,7 @@ export class Entity {
             id: this.body.id,
             x: this.body.position.x,
             y: this.body.position.y,
+            isStatic: this.isStatic,
         }
     }
 }

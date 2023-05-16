@@ -3,33 +3,38 @@ import { constant, entityType } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
 import { TestBall } from "./entity/testBall.js";
+import { Wall} from "./entity/wall.js";
+
+const tiles = await fetch("/assets/images/testmap.json")
+    .then(x => x.json());
 
 export const serverData = {
     /**
      * @type {Object<string, Player>}
-     */
-    playerMapByConnId: {},
-    /**
-     * The elements in this array are automatically managed.
-     * @type {Array<Player>}
-     */
-    players: [],
-    /**
-     * The elements in this array are automatically managed.
-     * @type {Array<Entity>}
-     */
-    entities: [],
+    */
+   playerMapByConnId: {},
+   /**
+    * The elements in this array are automatically managed.
+    * @type {Array<Player>}
+   */
+  players: [],
+  /**
+   * The elements in this array are automatically managed.
+   * @type {Array<Entity>}
+  */
+ entities: [],
 };
 
 /**
  * @param {Server} server 
- */
+*/
 export default function activity(server) {
     const noGravity = { x: 0, y: 0, scale: 0 }
     const engine = Matter.Engine.create({ gravity: noGravity });
     const runner = Matter.Runner.create();
     const lastPing = {};
-
+    let updateCounter = 0;
+    
     /**
      * @param {Entity} entity 
      */
@@ -49,8 +54,16 @@ export default function activity(server) {
 
     const init = () => {
 
-        // for test
-        for (let i = 0; i < 100; i++) addEntity(new TestBall());
+        const targetLayer = tiles.layers[1]; 
+        const { width, height } = targetLayer;
+        for (let y = 0; y < height; ++y){
+            for (let x = 0; x < width; ++x){
+                const tileId = targetLayer.data[x + y * width];
+                if (tileId !== 0)
+                    addEntity(new Wall(x * constant.blockCenter, y * constant.blockCenter, tileId));
+            }
+        }
+
 
         serverData.players.forEach((player, idx) => {
             const x = idx * 25 + 100;
@@ -111,6 +124,14 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
+        if (updateCounter === 0){
+            server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
+            ++updateCounter;
+        }
+        else{
+            server.broadcast("frame", serverData.entities
+                .filter(x => x.isStatic === false)
+                .map(x => x.toDTO()));
+        }
     });
 }

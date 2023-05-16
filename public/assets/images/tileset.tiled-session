@@ -1,0 +1,39 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "testmap.json",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "exportAsImage.useCurrentScale": true,
+    "fileStates": {
+        "cityBlockTileSetFull.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "testmap.json": {
+            "scale": 1.9939,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 447.61522644064394,
+                "y": 332.51416821304986
+            }
+        }
+    },
+    "last.exportedFilePath": "/Users/seowoo/seowokim/dev/WebRTC-phaser/public/assets/images",
+    "last.imagePath": "/Users/seowoo/Downloads/city block tile set",
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "json",
+    "openFiles": [
+        "testmap.json",
+        "cityBlockTileSetFull.tsx"
+    ],
+    "project": "tileset.tiled-project",
+    "recentFiles": [
+        "cityBlockTileSetFull.tsx",
+        "testmap.json"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

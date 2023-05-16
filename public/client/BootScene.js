@@ -2,6 +2,7 @@ import Player from "./entity/player.js";
 import { clientData } from "./client.js";
 import { constant, entityType } from "../constant.js";
 import TestBall from "./entity/testBall.js";
+import Entity from "./entity/entity.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -13,9 +14,11 @@ export default class BootScene extends Phaser.Scene {
 	preload() {
 		Player.prelodad(this);
 		TestBall.prelodad(this);
+		this.load.image('background', '../assets/images/testmap.png');
 	}
 
 	create() {
+		this.add.image(438, 360, 'background');
 		const cameraFollowPlayer = () => {
 			const playerEntity = Object.values(clientData.entities).find(x => x.meta.connId == clientData.connId);
 			const mine = playerEntity;

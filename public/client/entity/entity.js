@@ -2,10 +2,10 @@ import { constant, entityType } from "../../constant.js";
 import { clientData } from "../client.js";
 
 export default class Entity {
-    constructor() {
+    constructor(meta) {
         this.entityType = entityType.ENTITY;
         this.beforeMeta = null;
-        this.meta = null;
+        this.meta = meta;
         this.gameObject = clientData.scene.add.group();
     }
 
