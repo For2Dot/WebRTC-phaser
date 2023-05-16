@@ -28,6 +28,7 @@ export default function activity(server) {
     const noGravity = { x: 0, y: 0, scale: 0 }
     const engine = Matter.Engine.create({ gravity: noGravity });
     const runner = Matter.Runner.create();
+    const lastPing = {};
 
     /**
      * @param {Entity} entity 
@@ -66,6 +67,7 @@ export default function activity(server) {
 
 
     server.addEventListener("ping", ({ connId, payload }) => {
+        lastPing[connId] = Date();
         server.send(connId, "pong", { id: connId });
     });
 
@@ -73,18 +75,24 @@ export default function activity(server) {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
             addEntity(new Player(connId, 0, 0));
+            lastPing[connId] = null;
             if (serverData.players.length < constant.playerCnt)
                 return;
+            server.freezeRoom();
             const startBtn = document.querySelector("#start");
             startBtn.addEventListener("click", () => {
-                server.freezeRoom();
-                init();
-                setTimeout(() => {
+                const isAllReady = () => Object.values(lastPing).every(x => x !== null);
+                const startPollingFunc = () => {
+                    if (isAllReady() === false) {
+                        setTimeout(startPollingFunc, 100);
+                        return;
+                    }
+                    init();
                     server.broadcast("start", constant.playerCnt);
                     server.broadcast("chat", { id: "System", chat: "game started!" });
-                }, 100);
-                startBtn.style.display = "none";
-
+                    startBtn.style.display = "none";
+                }
+                startPollingFunc();
             });
             startBtn.removeAttribute("disabled");
         }
