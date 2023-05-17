@@ -13,6 +13,7 @@ export default class Player extends Entity {
 			clientData.scene.add.existing(x);
 			this.gameObject.add(x);
 		});
+		this.images[0].setMask(clientData.visionMask);
 	}
 
 	static prelodad(scene) {
