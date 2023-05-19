@@ -6,6 +6,11 @@ export const input = {
     SPRINT: "sprint",
 }
 
+export const playerType = {
+    THIEF: "thief",
+    POLICE: "police",
+};
+
 export const entityType = {
     ENTITY: "entity",
     PLAYER: "player",
@@ -26,4 +31,6 @@ export const constant = {
     ],
     blockPixel: 32,
     blockCenter: 16,
+    footPrintTimeInterval: 0.1,
+    footPrintLife: 0.5,
 }

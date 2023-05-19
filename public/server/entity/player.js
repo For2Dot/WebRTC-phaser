@@ -28,6 +28,8 @@ export class Player extends Entity {
             ...super.toDTO(),
             type: this.entityType,
             connId: this.connId,
+            isSprint: this.key[input.SPRINT],
+            isFire: false, // TODO
         }
     }
 }

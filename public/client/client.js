@@ -1,5 +1,5 @@
 import { Client } from "../server/webrtc.js";
-import { constant, entityType } from "../constant.js";
+import { constant, entityType, playerType } from "../constant.js";
 import Entity from "./entity/entity.js";
 import Player from "./entity/player.js";
 import TestBall from "./entity/testBall.js";
@@ -23,6 +23,7 @@ export const clientData = {
      * @type {Phaser.Display.Masks.GeometryMask}
      */
     visionMask: null,
+    role: playerType.POLICE,
 };
 
 /**
