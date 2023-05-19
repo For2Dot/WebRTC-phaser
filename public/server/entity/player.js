@@ -20,7 +20,11 @@ export class Player extends Entity {
         const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
         const x = dx * sprint * delta * this.speed;
         const y = dy * sprint * delta * this.speed;
-        Matter.Body.setVelocity(this.body, { x, y });
+
+        if (this.key[input.INTERACT])
+            console.log("interact");
+        else
+            Matter.Body.setVelocity(this.body, { x, y });
     }
 
     toDTO() {

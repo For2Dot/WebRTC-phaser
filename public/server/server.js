@@ -67,7 +67,7 @@ export default function activity(server) {
 
         serverData.players.forEach((player, idx) => {
             const x = idx * 25 + 100;
-            const y = 300;
+            const y = 200;
             Matter.Body.setPosition(player.body, { x, y });
         });
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
