@@ -15,11 +15,13 @@ export default class Player extends Entity {
 		});
 		this.images[0].setMask(clientData.visionMask);
 		this.lastFootprint = Date.now();
+		this.lastFire = Date.now();
 	}
 
 	static prelodad(scene) {
 		scene.load.atlas('female', '../assets/images/female.png', '../assets/images/female_atlas.json');
 		scene.load.image("footprint", '../assets/images/footprint.png');
+		scene.load.image("circle", '../assets/images/circle.png');
 	}
 
 	/**
@@ -44,8 +46,27 @@ export default class Player extends Entity {
 		});
 	}
 
+	updateFireBulletFx() {
+		if (clientData.role !== playerType.THIEF)
+			return;
+		if (this.meta.isFire != true)
+			return;
+		const {x, y} = this;
+		const createParticle = () => {
+			clientData.scene.add.particles(x, y, "circle", {
+				scale: {start: 0, end: 2},
+				alpha: {start: 0, end: 0.2},
+				duration: 100,
+			});
+		};
+		setTimeout(createParticle, 0);
+		setTimeout(createParticle, 400);
+		setTimeout(createParticle, 600);
+	}
+
 	update() {
 		super.update();
 		this.updateFootprint();
+		this.updateFireBulletFx();
 	}
 }
