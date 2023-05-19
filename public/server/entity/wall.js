@@ -8,4 +8,12 @@ export class Wall extends Entity {
         this.wallCode = code;
         this.isStatic = true;
     }
+
+    toDTO() {
+        return {
+            ...super.toDTO(),
+            width: constant.blockCenter,
+            height: constant.blockCenter,
+        }
+    }
 }

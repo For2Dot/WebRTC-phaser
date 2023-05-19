@@ -19,6 +19,10 @@ export const clientData = {
      * @type {Phaser.Scene}
      */
     scene: null,
+    /**
+     * @type {Phaser.Display.Masks.GeometryMask}
+     */
+    visionMask: null,
 };
 
 /**
