@@ -14,11 +14,9 @@ export default class BootScene extends Phaser.Scene {
 	preload() {
 		Player.prelodad(this);
 		TestBall.prelodad(this);
-		this.load.image('background', '../assets/images/testmap.png');
 	}
 
 	create() {
-		this.add.image(438, 360, 'background');
 		const graphics = this.add.graphics();
 		graphics.fillStyle(0xffffff, 0.1);
 		clientData.visionMask = new Phaser.Display.Masks.GeometryMask(this, graphics);
