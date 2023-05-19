@@ -16,6 +16,7 @@ export const entityType = {
 export const constant = {
     playerCnt: 1,
     clientLerp: 0.3,
+    clientZoom: 2,
     keyMap: [
         { key: "w", inputId: input.UP },
         { key: "a", inputId: input.LEFT },

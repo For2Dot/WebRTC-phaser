@@ -39,6 +39,7 @@ export default class BootScene extends Phaser.Scene {
 			}
 		}
 		cameraFollowPlayer();
+		this.cameras.main.setZoom(constant.clientZoom, constant.clientZoom);
 	}
 
 	updateVisionMask(x, y) {

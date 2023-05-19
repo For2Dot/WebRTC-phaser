@@ -1,3 +1,4 @@
+import { constant } from "../constant.js";
 import BootScene from "./BootScene.js";
 import { clientData } from "./client.js";
 
@@ -8,9 +9,7 @@ const config = {
 	type: Phaser.AUTO,
 	parent: 'simple-game',
 	scene: [BootScene],
-	scale: {
-		zoom: 2,
-	}
+	pixelArt: true,
 }
 const game = new Phaser.Game(config);
 const findScene = setInterval(() => {
