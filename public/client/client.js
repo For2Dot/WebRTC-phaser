@@ -4,6 +4,7 @@ import Entity from "./entity/entity.js";
 import Player from "./entity/player.js";
 import TestBall from "./entity/testBall.js";
 import Wall from "./entity/wall.js";
+import Bullet from "./entity/bullet.js";
 
 export const clientData = {
     players: [],
@@ -56,6 +57,8 @@ export const createEntity = (meta) => {
         entity = new TestBall(meta);
     else if (meta.type == entityType.WALL)
         entity = new Wall(meta);
+    else if (meta.type == entityType.BULLET)
+        entity = new Bullet(meta);
     else
         throw new Error("entity type is not defined");
     return entity;

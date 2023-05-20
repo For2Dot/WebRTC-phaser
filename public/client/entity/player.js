@@ -6,6 +6,8 @@ export default class Player extends Entity {
 	constructor(meta) {
 		super(meta);
 		this.entityType = entityType.PLAYER;
+		this.playerType = this.meta.playerType;
+		// this.body.type = entityType.PLAYER;
 		this.images = [
 			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "female", "townsfolk_f_idle_1"),
 		];
@@ -22,6 +24,7 @@ export default class Player extends Entity {
 		scene.load.atlas('female', '../assets/images/female.png', '../assets/images/female_atlas.json');
 		scene.load.image("footprint", '../assets/images/footprint.png');
 		scene.load.image("circle", '../assets/images/circle.png');
+		scene.load.image("bullet", '../assets/images/ship.png');
 	}
 
 	/**
@@ -47,10 +50,11 @@ export default class Player extends Entity {
 	}
 
 	updateFireBulletFx() {
-		if (clientData.role !== playerType.THIEF)
+		if (clientData.role === playerType.THIEF)
 			return;
 		if (this.meta.isFire != true)
 			return;
+		console.log("fire!!!");
 		const {x, y} = this;
 		const createParticle = () => {
 			clientData.scene.add.particles(x, y, "circle", {
@@ -62,6 +66,10 @@ export default class Player extends Entity {
 		setTimeout(createParticle, 0);
 		setTimeout(createParticle, 400);
 		setTimeout(createParticle, 600);
+	}
+
+	updateFire(){
+
 	}
 
 	update() {

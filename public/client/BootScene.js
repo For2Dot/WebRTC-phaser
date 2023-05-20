@@ -3,6 +3,7 @@ import { clientData } from "./client.js";
 import { constant, entityType } from "../constant.js";
 import TestBall from "./entity/testBall.js";
 import Entity from "./entity/entity.js";
+import Bullet from "./entity/bullet.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -14,6 +15,8 @@ export default class BootScene extends Phaser.Scene {
 	preload() {
 		Player.prelodad(this);
 		TestBall.prelodad(this);
+		Bullet.prelodad(this);
+
 	}
 
 	create() {

@@ -1,8 +1,9 @@
 import { Server } from "./webrtc.js";
-import { constant, entityType } from "../constant.js";
+import { constant, entityType, playerType, input } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
 import { TestBall } from "./entity/testBall.js";
+import { Bullet } from "./entity/bullet.js";
 import { Wall} from "./entity/wall.js";
 
 const tiles = await fetch("/assets/images/testmap.json")
@@ -50,6 +51,8 @@ export default function activity(server) {
 
     const removeEntity = (entity) => {
         // TODO
+        console.log("remove entity");
+        console.log(entity);
     }
 
     const init = () => {
@@ -66,8 +69,8 @@ export default function activity(server) {
 
 
         serverData.players.forEach((player, idx) => {
-            const x = idx * 25 + 100;
-            const y = 300;
+            const x = idx * 25 + 200;
+            const y = 330;
             Matter.Body.setPosition(player.body, { x, y });
         });
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
@@ -87,7 +90,10 @@ export default function activity(server) {
     server.addConnListener((connId, state) => {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
-            addEntity(new Player(connId, 0, 0));
+            if (serverData.players.length === 0)
+                addEntity(new Player(connId, 0, 0, 1));
+            else
+                addEntity(new Player(connId, 0, 0, 0));
             lastPing[connId] = null;
             if (serverData.players.length < constant.playerCnt)
                 return;
@@ -115,7 +121,31 @@ export default function activity(server) {
         const key = constant.keyMap.find(x => x.inputId === payload.inputId);
         if (key == null)
             return;
+        if (key.inputId === input.FIRE){
+            serverData.playerMapByConnId[connId].fire(engine, serverData);
+        }
         serverData.playerMapByConnId[connId].key[key.inputId] = payload.state;
+    });
+
+    Matter.Events.on(engine, "collisionStart", (event) =>{
+        console.log("Start collision");
+        // event.pairs.forEach(({bodyA, bodyB}) => {
+        //     const entity1 = serverData.entities[bodyA.parent.id];
+        //     const entity2 = serverData.entities[bodyB.parent.id];
+        //     // console.log(entity1, entity2);
+        //     if (entity1.entityType === entityType.BULLET){
+        //         if (entity2.entityType === entityType.WALL) ;
+        //             // removeEntity(entity1);
+        //         else if (entity2.entityType === entityType.PLAYER && entity2.playerType === playerType.THIEF)
+        //             console.log("damage");
+        //     }
+        //     else if (entity2.entityType === entityType.BULLET){
+        //         if (entity1.entityType === entityType.WALL) ;
+        //             // removeEntity(entity2);
+        //         else if (entity1.entityType === entityType.PLAYER && entity1.playerType === playerType.THIEF)
+        //             console.log("damage");
+        //     }
+        // });
     });
 
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {

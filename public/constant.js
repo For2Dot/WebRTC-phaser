@@ -4,6 +4,7 @@ export const input = {
     DOWN: "down",
     RIGHT: "right",
     SPRINT: "sprint",
+    FIRE : "fire",
 }
 
 export const playerType = {
@@ -16,6 +17,7 @@ export const entityType = {
     PLAYER: "player",
     TESTBALL: "testBall",
     WALL: "wall",
+    BULLET: "bullet",
 }
 
 export const constant = {
@@ -28,6 +30,7 @@ export const constant = {
         { key: "s", inputId: input.DOWN },
         { key: "d", inputId: input.RIGHT },
         { key: "shift", inputId: input.SPRINT },
+        { key: "l", inputId: input.FIRE },
     ],
     blockPixel: 32,
     blockCenter: 16,
