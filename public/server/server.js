@@ -91,7 +91,7 @@ export default function activity(server) {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
             if (serverData.players.length === 0)
-                addEntity(new Player(connId, 0, 0, 1));
+                addEntity(new Player(connId, 0, 0, 1, engine));
             else
                 addEntity(new Player(connId, 0, 0, 0));
             lastPing[connId] = null;
@@ -121,9 +121,6 @@ export default function activity(server) {
         const key = constant.keyMap.find(x => x.inputId === payload.inputId);
         if (key == null)
             return;
-        if (key.inputId === input.FIRE){
-            serverData.playerMapByConnId[connId].fire(engine, serverData);
-        }
         serverData.playerMapByConnId[connId].key[key.inputId] = payload.state;
     });
 

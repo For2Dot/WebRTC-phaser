@@ -54,7 +54,6 @@ export default class Player extends Entity {
 			return;
 		if (this.meta.isFire != true)
 			return;
-		console.log("fire!!!");
 		const {x, y} = this;
 		const createParticle = () => {
 			clientData.scene.add.particles(x, y, "circle", {
@@ -66,10 +65,6 @@ export default class Player extends Entity {
 		setTimeout(createParticle, 0);
 		setTimeout(createParticle, 400);
 		setTimeout(createParticle, 600);
-	}
-
-	updateFire(){
-
 	}
 
 	update() {
