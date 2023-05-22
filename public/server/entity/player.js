@@ -6,6 +6,7 @@ import { serverService } from "../server.js";
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0, isPolice = 0) {
         super(Matter.Bodies.circle(x, y, 10));
+
         this.entityType = entityType.PLAYER;
         this.connId = connId;
         this.key = {};
@@ -47,11 +48,20 @@ export class Player extends Entity {
         const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
         const x = dx * this.sprintValue * delta * this.speed;
         const y = dy * this.sprintValue * delta * this.speed;
-        Matter.Body.setVelocity(this.body, { x, y });
+      
+        if (this.key[input.INTERACT])
+            this.interact();
+        else
+        {
+            this.body.collided = [];
+            Matter.Body.setVelocity(this.body, { x, y });
+        }
+  
         if (dx === 0 && dy === 0)
             return ;
         this.dx = dx;
         this.dy = dy;
+      
     }
 
     fire(){
@@ -102,12 +112,19 @@ export class Player extends Entity {
     toDTO() {
         return {
             ...super.toDTO(),
+            y: this.body.position.y - 7,
             type: this.entityType,
             connId: this.connId,
             isSprint: this.isSprint,
             isFire: this.isFire,
             playerType: this.playerType,
-            isFire: this.isFire,
         }
+    }
+
+    interact() {
+        if (this.body.collided.length === 0)
+            return;
+        this.body.collided.forEach(entity => entity.interact());
+        this.key[input.INTERACT] = false;
     }
 }

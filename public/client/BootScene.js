@@ -1,9 +1,11 @@
 import Player from "./entity/player.js";
 import { clientData } from "./client.js";
 import { constant, entityType } from "../constant.js";
-import TestBall from "./entity/testBall.js";
 import Entity from "./entity/entity.js";
 import Bullet from "./entity/bullet.js";
+import Wall from "./entity/wall.js";
+import Door from "./entity/door.js";
+import Generator from "./entity/generator.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -15,9 +17,10 @@ export default class BootScene extends Phaser.Scene {
 
 	preload() {
 		Player.prelodad(this);
-		TestBall.prelodad(this);
+		Wall.prelodad(this);
+		Door.prelodad(this);
+		Generator.prelodad(this);
 		Bullet.prelodad(this);
-
 	}
 
 	create() {
@@ -48,7 +51,8 @@ export default class BootScene extends Phaser.Scene {
 		const polygons = [];
 		polygons.push([[-1000, -1000], [1000, -1000], [1000, 1000], [-1000, 1000]]);
 		for (const entityId in clientData.entities) {
-			if (clientData.entities[entityId].meta.isStatic) {
+			if (clientData.entities[entityId].meta.type == entityType.WALL || 
+				(clientData.entities[entityId].meta.type == entityType.DOOR && clientData.entities[entityId].isOpened == false) ) {
 				const { x, y, width, height } = clientData.entities[entityId].meta;
 				polygons.push([
 					[x - width * 0.5, y - height * 0.5],

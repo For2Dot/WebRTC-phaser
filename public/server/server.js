@@ -5,6 +5,8 @@ import { Player } from "./entity/player.js";
 import { TestBall } from "./entity/testBall.js";
 import { Bullet } from "./entity/bullet.js";
 import { Wall} from "./entity/wall.js";
+import { Door} from "./entity/door.js";
+import { Generator } from "./entity/generator.js";
 
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
@@ -50,6 +52,7 @@ export default function activity(server) {
         if (entity.entityType == entityType.PLAYER) {
             serverData.players.push(entity);
             serverData.playerMapByConnId[entity.connId] = entity;
+            // Matter.Composite.add(engine.world, entity.sensor);
         }
         if (entity.appendToEngine)
             Matter.Composite.add(engine.world, entity.body);
@@ -81,15 +84,22 @@ export default function activity(server) {
         for (let y = 0; y < height; ++y){
             for (let x = 0; x < width; ++x){
                 const tileId = targetLayer.data[x + y * width];
-                if (tileId !== 0)
+
+                if (tileId === 1)
                     serverService.addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
+                else if (tileId === 2)
+                    serverService.addEntity(new Door(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
+                else if (tileId === 3)
+                    serverService.addEntity(new Generator(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
             }
         }
 
 
         serverData.players.forEach((player, idx) => {
-            const x = idx * 25 + 200;
-            const y = 330;
+
+            const x = idx * 25 + 100;
+            const y = 100;
+          
             Matter.Body.setPosition(player.body, { x, y });
         });
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
@@ -143,7 +153,43 @@ export default function activity(server) {
         serverData.playerMapByConnId[connId].key[key.inputId] = payload.state;
     });
 
-    Matter.Events.on(engine, "collisionStart", (event) =>{
+    Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
+        const delta = source.delta * 0.001;
+        serverData.entities.forEach((entity) => entity.update(delta));
+    });
+
+    Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
+        if (updateCounter === 0){
+            server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
+            ++updateCounter;
+        }
+        else{
+            server.broadcast("frame", serverData.entities
+                .filter(x => x.entityType !== entityType.WALL)
+                .map(x => x.toDTO()));
+        }
+    });
+    
+
+    Matter.Events.on(engine, 'collisionStart', function(event) {
+        const pairs = event.pairs;
+
+        for (let i = 0; i < pairs.length; i++) {
+            const pair = pairs[i];
+            const bodyA = serverData.entities[pair.bodyA.id - 1];
+            const bodyB = serverData.entities[pair.bodyB.id - 1];
+
+            if (bodyA.entityType === entityType.PLAYER && bodyB.entityType !== entityType.WALL)
+            {
+                if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
+                {
+                    bodyA.body.collided.push(bodyB);
+                }
+            }
+        }
+    });
+  
+      Matter.Events.on(engine, "collisionStart", (event) =>{
         console.log("Start collision");
         event.pairs.forEach(x => {
             const ai = x.bodyA.id;
@@ -160,23 +206,15 @@ export default function activity(server) {
                 if (x.bodyA.label === playerType.THIEF)
                     serverData.entities[ai - 1].slowTime = 1; 
             }
+          
+            const bodyA = serverData.entities[ai - serverService.count];
+            const bodyB = serverData.entities[bi - serverService.count];
+
+            if (bodyA.entityType === entityType.PLAYER && bodyB.entityType !== entityType.WALL)
+                if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
+                    bodyA.body.collided.push(bodyB);
+            
         });
     });
-
-    Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
-        const delta = source.delta * 0.001;
-        serverData.entities.forEach((entity) => entity.update(delta));
-    });
-
-    Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        if (updateCounter === 0){
-            server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
-            ++updateCounter;
-        }
-        else{
-            server.broadcast("frame", serverData.entities
-                .filter(x => x.isStatic === false)
-                .map(x => x.toDTO()));
-        }
-    });
+    
 }
