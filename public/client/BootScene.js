@@ -4,6 +4,7 @@ import { constant, entityType } from "../constant.js";
 import Entity from "./entity/entity.js";
 import Wall from "./entity/wall.js";
 import Door from "./entity/door.js";
+import Generator from "./entity/generator.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -16,6 +17,7 @@ export default class BootScene extends Phaser.Scene {
 		Player.prelodad(this);
 		Wall.prelodad(this);
 		Door.prelodad(this);
+		Generator.prelodad(this);
 		this.load.image('background', '../assets/images/testmap.png');
 	}
 

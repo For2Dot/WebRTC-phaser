@@ -5,6 +5,7 @@ import { Player } from "./entity/player.js";
 import { TestBall } from "./entity/testBall.js";
 import { Wall} from "./entity/wall.js";
 import { Door} from "./entity/door.js";
+import { Generator } from "./entity/generator.js";
 
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
@@ -65,6 +66,8 @@ export default function activity(server) {
                     addEntity(new Wall(x * constant.blockCenter, y * constant.blockCenter, tileId));
                 else if (tileId === 2)
                     addEntity(new Door(x * constant.blockCenter, y * constant.blockCenter, tileId));
+                else if (tileId === 3)
+                    addEntity(new Generator(x * constant.blockCenter, y * constant.blockCenter, tileId));
             }
         }
 
@@ -148,48 +151,14 @@ export default function activity(server) {
             const bodyA = serverData.entities[pair.bodyA.id - 1];
             const bodyB = serverData.entities[pair.bodyB.id - 1];
 
-            if (bodyA.entityType === entityType.PLAYER && bodyB.entityType === entityType.DOOR)
+            if (bodyA.entityType === entityType.PLAYER && bodyB.entityType !== entityType.WALL)
             {
-                const playerBody = bodyA;
-                const doorBody = bodyB;
-
-                // const player = serverData.playerMapByConnId[playerBody.connId];
-                if (playerBody.body.collided.find(x => x === doorBody) == null)
+                if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
                 {
-                    playerBody.body.collided.push(doorBody);
+                    bodyA.body.collided.push(bodyB);
                 }
-            }   
+            }
         }
     });
     
-    // Matter.Events.on(engine, 'collisionActive', function(event) {
-    //     const pairs = event.pairs;
-
-    //     for (let i = 0; i < pairs.length; i++) {
-    //         const pair = pairs[i];
-    //         const bodyA = serverData.entities[pair.bodyA.id - 1];
-    //         const bodyB = serverData.entities[pair.bodyB.id - 1];
-
-    //         // console.log(bodyA.entityType, bodyB.entityType);
-    //         if (bodyA.entityType === entityType.PLAYER && bodyB.entityType === entityType.DOOR)
-    //         {
-    //             console.log(bodyA.entityType, bodyB.entityType, 'collision active');
-    //         }   
-    //     }
-    // });
-
-
-    // Matter.Events.on(engine, 'collisionEnd', function(event) {
-    //     const pairs = event.pairs;
-    //     for (let i = 0; i < pairs.length; i++) {
-    //         const pair = pairs[i];
-    //         const bodyA = serverData.entities[pair.bodyA.id - 1];
-    //         const bodyB = serverData.entities[pair.bodyB.id - 1];
-
-    //         if (bodyA.entityType === entityType.PLAYER)
-    //             bodyA.collided = bodyA.collided.filter(x => x !== bodyB);
-    //         if (bodyB.entityType === entityType.PLAYER)
-    //             bodyB.collided = bodyB.collided.filter(x => x !== bodyA);
-    //     }
-    // });
 }

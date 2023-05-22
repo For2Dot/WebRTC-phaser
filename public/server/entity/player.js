@@ -3,7 +3,7 @@ import { constant, input, entityType } from "../../constant.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0) {
-        super(Matter.Bodies.circle(x, y, 10));
+        super(Matter.Bodies.circle(x, y, 8));
         this.entityType = entityType.PLAYER;
         this.connId = connId;
         this.speed = 50;
@@ -44,13 +44,7 @@ export class Player extends Entity {
     interact() {
         if (this.body.collided.length === 0)
             return;
-        this.body.collided.forEach(entity => {
-            if (entity.entityType === entityType.DOOR)
-            {
-                console.log(entity.body.id);
-                entity.toggle();
-            }
-        });
+        this.body.collided.forEach(entity => entity.interact());
         this.key[input.INTERACT] = false;
     }
 }

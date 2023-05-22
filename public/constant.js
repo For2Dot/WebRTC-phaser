@@ -18,6 +18,7 @@ export const entityType = {
     TESTBALL: "testBall",
     WALL: "wall",
     DOOR: "door",
+    GENERATOR: "generator",
 }
 
 export const constant = {

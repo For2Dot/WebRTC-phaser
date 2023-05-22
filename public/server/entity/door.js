@@ -23,7 +23,7 @@ export class Door extends Entity {
         }
     }
 
-    toggle() {
+    interact() {
         if (this.isOpened) {
             this.body.isSensor = false;
             this.isOpened = false;

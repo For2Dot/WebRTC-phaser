@@ -5,6 +5,7 @@ import Player from "./entity/player.js";
 import TestBall from "./entity/testBall.js";
 import Wall from "./entity/wall.js";
 import Door from "./entity/door.js";
+import Generator from "./entity/generator.js";
 
 export const clientData = {
     players: [],
@@ -59,6 +60,8 @@ export const createEntity = (meta) => {
         entity = new Wall(meta);
     else if (meta.type == entityType.DOOR)
         entity = new Door(meta);
+    else if (meta.type == entityType.GENERATOR)
+        entity = new Generator(meta);
     else
         throw new Error("entity type is not defined");
     return entity;
