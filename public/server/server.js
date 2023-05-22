@@ -26,6 +26,11 @@ export const serverData = {
  entities: [],
 };
 
+export const serverService = {
+    addEntity: null,
+    removeEntity: null,
+}
+
 /**
  * @param {Server} server 
 */
@@ -39,7 +44,7 @@ export default function activity(server) {
     /**
      * @param {Entity} entity 
      */
-    const addEntity = (entity) => {
+    serverService.addEntity = (entity) => {
         serverData.entities.push(entity);
         if (entity.entityType == entityType.PLAYER) {
             serverData.players.push(entity);
@@ -48,11 +53,21 @@ export default function activity(server) {
         if (entity.appendToEngine)
             Matter.Composite.add(engine.world, entity.body);
     }
+    
 
-    const removeEntity = (entity) => {
-        // TODO
-        console.log("remove entity");
-        console.log(entity);
+    /**
+     * @param {Entity} entity 
+     */
+    serverService.removeEntity = (entity) => {
+        if (serverData.entities.find(x => x === entity) == null)
+            return;
+        serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
+        if (entity.entityType === entityType.PLAYER) {
+            serverData.players = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
+            delete serverData.playerMapByConnId[entity.connId];
+        }
+        if (engine.appendToEngine)
+            Matter.Composite.remove(engine.world, entity.body);
     }
 
     const init = () => {
@@ -63,7 +78,7 @@ export default function activity(server) {
             for (let x = 0; x < width; ++x){
                 const tileId = targetLayer.data[x + y * width];
                 if (tileId !== 0)
-                    addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
+                    serverService.addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
             }
         }
 
@@ -91,9 +106,9 @@ export default function activity(server) {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
             if (serverData.players.length === 0)
-                addEntity(new Player(connId, 0, 0, 1, engine));
+                serverService.addEntity(new Player(connId, 0, 0, 1, engine));
             else
-                addEntity(new Player(connId, 0, 0, 0));
+                serverService.addEntity(new Player(connId, 0, 0, 0));
             lastPing[connId] = null;
             if (serverData.players.length < constant.playerCnt)
                 return;

@@ -1,7 +1,7 @@
 import { Entity } from "./entity.js";
 import { input, entityType,  playerType, constant } from "../../constant.js";
 import { Bullet } from "./bullet.js";
-import { serverData } from "../server.js";
+import { serverService } from "../server.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0, isPolice = 0, engine) {
@@ -58,13 +58,7 @@ export class Player extends Entity {
         const x = bx + (Math.cos(this.body.angle) * 10);
         const y = by + (Math.sin(this.body.angle) * 10);
 
-        const bullet = new Bullet(x, y);
-        serverData.entities.push(bullet);
-        Matter.Composite.add(this.engine.world, bullet.body);
-        Matter.Body.applyForce(bullet.body, this.body.position, {
-            x: this.dx * 0.09,
-            y: this.dy * 0.09,
-        },);
+        serverService.addEntity(new Bullet(x, y, this.dx, this.dy));
         return (true);
     }
 
