@@ -9,6 +9,7 @@ export class Door extends Entity {
                 { isStatic: true },
         ));
         this.entityType = entityType.DOOR;
+        this.body.label = entityType.DOOR;
         this.wallCode = code;
         this.isStatic = true;
         this.isOpened = false;

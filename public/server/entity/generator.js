@@ -9,6 +9,7 @@ export class Generator extends Entity {
                 { isStatic: true },
         ));
         this.entityType = entityType.GENERATOR;
+        this.body.label = entityType.GENERATOR;
         this.wallCode = code;
         this.isStatic = true;
         this.genProcess = 0;

@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { input, entityType,  playerType, constant } from "../../constant.js";
+import { input, entityType, playerType, constant } from "../../constant.js";
 import { Bullet } from "./bullet.js";
 import { serverService } from "../server.js";
 
@@ -18,15 +18,16 @@ export class Player extends Entity {
         this.dx = 1;
         this.dy = 0;
         this.stamina = constant.maximumStamina;
-        if (isPolice){
+        if (isPolice) {
             this.speed = 80;
             this.playerType = playerType.POLICE;
         }
-        else{
+        else {
             this.speed = 50;
             this.playerType = playerType.THIEF;
         }
         this.body.label = this.playerType;
+        this.body.collided = [];
     }
 
     update(delta) {
@@ -48,29 +49,28 @@ export class Player extends Entity {
         const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
         const x = dx * this.sprintValue * delta * this.speed;
         const y = dy * this.sprintValue * delta * this.speed;
-      
+
         if (this.key[input.INTERACT])
             this.interact();
-        else
-        {
+        else {
             this.body.collided = [];
             Matter.Body.setVelocity(this.body, { x, y });
         }
-  
+
         if (dx === 0 && dy === 0)
-            return ;
+            return;
         this.dx = dx;
         this.dy = dy;
-      
+
     }
 
-    fire(){
+    fire() {
         if (this.playerType === playerType.THIEF)
             return (false);
         if (this.stamina < constant.fireStamina)
             return (false);
         this.stamina -= constant.fireStamina;
-        const {x: bx, y: by} = this.body.position;
+        const { x: bx, y: by } = this.body.position;
         const x = bx + (Math.cos(this.body.angle) * 10);
         const y = by + (Math.sin(this.body.angle) * 10);
 
@@ -78,14 +78,14 @@ export class Player extends Entity {
         return (true);
     }
 
-    notFire(){
+    notFire() {
         return (false);
     }
 
-    sprint(){
+    sprint() {
         if (this.playerType === playerType.POLICE)
             return (false);
-        if (this.stamina < constant.sprintStamina){
+        if (this.stamina < constant.sprintStamina) {
             this.sprintValue = 1;
             return (false);
         }
@@ -94,17 +94,17 @@ export class Player extends Entity {
         return (true);
     }
 
-    notSprint(){
+    notSprint() {
         this.sprintValue = 1;
         return (false);
     }
 
-    damagedByBullet(){
+    damagedByBullet() {
         ++this.slowTime;
         this.speed = 10;
     }
 
-    recovred(){
+    recovred() {
         this.slowTime = 0;
         this.speed = 50;
     }
