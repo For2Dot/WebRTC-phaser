@@ -3,6 +3,7 @@ import { clientData } from "./client.js";
 import { constant, entityType } from "../constant.js";
 import TestBall from "./entity/testBall.js";
 import Entity from "./entity/entity.js";
+import Bullet from "./entity/bullet.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -15,11 +16,11 @@ export default class BootScene extends Phaser.Scene {
 	preload() {
 		Player.prelodad(this);
 		TestBall.prelodad(this);
-		this.load.image('background', '../assets/images/testmap.png');
+		Bullet.prelodad(this);
+
 	}
 
 	create() {
-		this.add.image(438, 360, 'background');
 		const graphics = this.add.graphics();
 		graphics.fillStyle(0xffffff, 0.1);
 		clientData.visionMask = new Phaser.Display.Masks.GeometryMask(this, graphics);
@@ -83,6 +84,21 @@ export default class BootScene extends Phaser.Scene {
 	 */
 	isInVisionMask(entity) {
 		return Phaser.Geom.Polygon.ContainsPoint(this.visionPolygon, new Phaser.Geom.Point(entity.x, entity.y));
+	}
+
+	makeBar(x, y){
+		let bar = this.add.graphics();
+		bar.fillStyle(0x2ecc71, 1);
+		bar.fillRect(0, 0, 200, 50);
+
+		bar.x = x;
+		bar.y = y;
+
+		return bar;
+	}
+
+	setBarValue(bar, percentage){
+		bar.scaleX = percentage / 100;
 	}
 
 	update() {

@@ -4,6 +4,7 @@ export const input = {
     DOWN: "down",
     RIGHT: "right",
     SPRINT: "sprint",
+    FIRE : "fire",
 }
 
 export const playerType = {
@@ -16,10 +17,11 @@ export const entityType = {
     PLAYER: "player",
     TESTBALL: "testBall",
     WALL: "wall",
+    BULLET: "bullet",
 }
 
 export const constant = {
-    playerCnt: 1,
+    playerCnt: 2,
     clientLerp: 0.3,
     clientZoom: 2,
     keyMap: [
@@ -28,9 +30,14 @@ export const constant = {
         { key: "s", inputId: input.DOWN },
         { key: "d", inputId: input.RIGHT },
         { key: "shift", inputId: input.SPRINT },
+        { key: "l", inputId: input.FIRE },
     ],
     blockPixel: 32,
     blockCenter: 16,
     footPrintTimeInterval: 0.1,
     footPrintLife: 0.5,
+    recoveryStaminaPerFrame: 2000,
+    sprintStamina: 50,
+    fireStamina: 10000,
+    maximumStamina: 10000,
 }
