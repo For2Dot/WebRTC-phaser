@@ -9,6 +9,7 @@ export default class BootScene extends Phaser.Scene {
 		super("BootScene");
 		this.keyState = {};
 		this.images = {};
+		this.visionPolygon = new Phaser.Geom.Polygon([]);
 	}
 
 	preload() {
@@ -58,6 +59,7 @@ export default class BootScene extends Phaser.Scene {
 		}
 		let segments = VisibilityPolygon.convertToSegments(polygons);
 		segments = VisibilityPolygon.breakIntersections(segments);
+		const polygon = [];
 		const position = [x, y];
 		if (VisibilityPolygon.inPolygon(position, polygons[0])) {
 			const visibility = VisibilityPolygon.compute(position, segments);
@@ -67,11 +69,20 @@ export default class BootScene extends Phaser.Scene {
 			graphics.moveTo(visibility[0][0], visibility[0][1]);
 			for (const idx in visibility) {
 				const [x1, y1] = visibility[+idx];
+				polygon.push(new Phaser.Geom.Point(x1, y1));
 				graphics.lineTo(x1, y1);
 			}
 			graphics.fillPath();
 			clientData.visionMask.setShape(graphics);
 		}
+		this.visionPolygon = new Phaser.Geom.Polygon(polygon);
+	}
+
+	/**
+	 * @param {Entity} entity 
+	 */
+	isInVisionMask(entity) {
+		return Phaser.Geom.Polygon.ContainsPoint(this.visionPolygon, new Phaser.Geom.Point(entity.x, entity.y));
 	}
 
 	update() {
@@ -79,6 +90,8 @@ export default class BootScene extends Phaser.Scene {
 			this.updateVisionMask(+this.mine.x, +this.mine.y);
 		}
 		for (const id in clientData.entities) {
+			if (clientData.entities[id].meta.isStatic == false)
+				clientData.entities[id].isInVisionMask = this.isInVisionMask(clientData.entities[id]);
 			clientData.entities[id].update();
 		}
 		this.input.keyboard.on('keydown', (event) => {
