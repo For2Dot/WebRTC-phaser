@@ -27,6 +27,7 @@ export const serverData = {
 };
 
 export const serverService = {
+    count: 1,
     addEntity: null,
     removeEntity: null,
 }
@@ -61,13 +62,16 @@ export default function activity(server) {
     serverService.removeEntity = (entity) => {
         if (serverData.entities.find(x => x === entity) == null)
             return;
+        else if (entity.entityType !== entityType.BULLET)
+            return ;
         serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
         if (entity.entityType === entityType.PLAYER) {
             serverData.players = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
             delete serverData.playerMapByConnId[entity.connId];
         }
-        if (engine.appendToEngine)
+        if (entity.appendToEngine)
             Matter.Composite.remove(engine.world, entity.body);
+        ++serverService.count;
     }
 
     const init = () => {
@@ -106,7 +110,7 @@ export default function activity(server) {
         if (state === "connected") {
             server.broadcast("chat", { id: connId, chat: "has joined." });
             if (serverData.players.length === 0)
-                serverService.addEntity(new Player(connId, 0, 0, 1, engine));
+                serverService.addEntity(new Player(connId, 0, 0, 1));
             else
                 serverService.addEntity(new Player(connId, 0, 0, 0));
             lastPing[connId] = null;
@@ -141,23 +145,22 @@ export default function activity(server) {
 
     Matter.Events.on(engine, "collisionStart", (event) =>{
         console.log("Start collision");
-        // event.pairs.forEach(({bodyA, bodyB}) => {
-        //     const entity1 = serverData.entities[bodyA.parent.id];
-        //     const entity2 = serverData.entities[bodyB.parent.id];
-        //     // console.log(entity1, entity2);
-        //     if (entity1.entityType === entityType.BULLET){
-        //         if (entity2.entityType === entityType.WALL) ;
-        //             // removeEntity(entity1);
-        //         else if (entity2.entityType === entityType.PLAYER && entity2.playerType === playerType.THIEF)
-        //             console.log("damage");
-        //     }
-        //     else if (entity2.entityType === entityType.BULLET){
-        //         if (entity1.entityType === entityType.WALL) ;
-        //             // removeEntity(entity2);
-        //         else if (entity1.entityType === entityType.PLAYER && entity1.playerType === playerType.THIEF)
-        //             console.log("damage");
-        //     }
-        // });
+        event.pairs.forEach(x => {
+            const ai = x.bodyA.id;
+            const bi = x.bodyB.id;
+            if (x.bodyA.label === entityType.BULLET){
+                if (x.bodyB.label !== playerType.POLICE)
+                    serverService.removeEntity(serverData.entities[ai - serverService.count]);
+                if (x.bodyB.label === playerType.THIEF)
+                    serverData.entities[bi - 1].slowTime = 1;
+            }
+            else if (x.bodyB.label === entityType.BULLET){
+                if (x.bodyA.label !== playerType.POLICE)
+                    serverService.removeEntity(serverData.entities[bi - serverService.count]);
+                if (x.bodyA.label === playerType.THIEF)
+                    serverData.entities[ai - 1].slowTime = 1; 
+            }
+        });
     });
 
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {

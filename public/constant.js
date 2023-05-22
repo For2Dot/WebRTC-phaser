@@ -21,7 +21,7 @@ export const entityType = {
 }
 
 export const constant = {
-    playerCnt: 1,
+    playerCnt: 2,
     clientLerp: 0.3,
     clientZoom: 2,
     keyMap: [
@@ -36,9 +36,8 @@ export const constant = {
     blockCenter: 16,
     footPrintTimeInterval: 0.1,
     footPrintLife: 0.5,
-    recoveryStaminaPerFrame: 1,
+    recoveryStaminaPerFrame: 2000,
     sprintStamina: 50,
-    fireStamina: 5000,
-    minimumStamina: 0,
+    fireStamina: 10000,
     maximumStamina: 10000,
 }

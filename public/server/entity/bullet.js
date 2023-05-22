@@ -10,6 +10,7 @@ export class Bullet extends Entity {
                 density: 0.1,
             },
         ));
+		this.body.isSensor = true;
 		this.entityType = entityType.BULLET;
 		this.body.label = entityType.BULLET;
         Matter.Body.applyForce(this.body, this.body.position, {
@@ -17,8 +18,11 @@ export class Bullet extends Entity {
             y: dy * 0.09,
         },);
         setTimeout(() => {
-            console.log(this);
             serverService.removeEntity(this);
         }, 1000);
     }
+
+	collisionEvent(){
+		serverService.removeEntity(this);
+	}
 }

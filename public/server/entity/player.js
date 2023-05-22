@@ -4,24 +4,28 @@ import { Bullet } from "./bullet.js";
 import { serverService } from "../server.js";
 
 export class Player extends Entity {
-    constructor(connId, x = 0, y = 0, isPolice = 0, engine) {
+    constructor(connId, x = 0, y = 0, isPolice = 0) {
         super(Matter.Bodies.circle(x, y, 10));
         this.entityType = entityType.PLAYER;
-        this.body.label = entityType.PLAYER;
         this.connId = connId;
-        this.speed = 5;
         this.key = {};
-        this.engine = engine;
         this.isFire = false;
         this.isSprint = false;
         this.sprintValue = 1;
+        this.slowTime = 0;
+        this.bulletTime = 0;
         this.dx = 1;
         this.dy = 0;
         this.stamina = constant.maximumStamina;
-        if (isPolice)
+        if (isPolice){
+            this.speed = 80;
             this.playerType = playerType.POLICE;
-        else
+        }
+        else{
+            this.speed = 50;
             this.playerType = playerType.THIEF;
+        }
+        this.body.label = this.playerType;
     }
 
     update(delta) {
@@ -29,11 +33,13 @@ export class Player extends Entity {
         const isLeft = this.key[input.LEFT];
         const isDown = this.key[input.DOWN];
         const isUp = this.key[input.UP];
-        // const sprint = this.key[input.SPRINT] ? 2 : 1;
 
         if (this.stamina < constant.maximumStamina)
-            this.stamina += constant.recoveryStaminaPerFrame;
-        console.log(this.stamina);
+            this.stamina += constant.recoveryStaminaPerFrame * delta;
+        if (this.slowTime !== 0)
+            this.damagedByBullet();
+        if (this.slowTime > 400)
+            this.recovred();
 
         this.isFire = this.key[input.FIRE] ? this.fire() : this.notFire();
         this.isSprint = this.key[input.SPRINT] ? this.sprint() : this.notSprint();
@@ -67,14 +73,14 @@ export class Player extends Entity {
     }
 
     sprint(){
-        // if (this.playerType === playerType.POLICE)
-        //     return (false);
+        if (this.playerType === playerType.POLICE)
+            return (false);
         if (this.stamina < constant.sprintStamina){
             this.sprintValue = 1;
             return (false);
         }
         this.stamina -= constant.sprintStamina;
-        this.sprintValue = 10;
+        this.sprintValue = 2;
         return (true);
     }
 
@@ -84,10 +90,12 @@ export class Player extends Entity {
     }
 
     damagedByBullet(){
-        this.speed = 1;
+        ++this.slowTime;
+        this.speed = 10;
     }
 
     recovred(){
+        this.slowTime = 0;
         this.speed = 50;
     }
 
