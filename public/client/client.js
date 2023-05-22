@@ -4,6 +4,7 @@ import Entity from "./entity/entity.js";
 import Player from "./entity/player.js";
 import TestBall from "./entity/testBall.js";
 import Wall from "./entity/wall.js";
+import Door from "./entity/door.js";
 
 export const clientData = {
     players: [],
@@ -56,6 +57,8 @@ export const createEntity = (meta) => {
         entity = new TestBall(meta);
     else if (meta.type == entityType.WALL)
         entity = new Wall(meta);
+    else if (meta.type == entityType.DOOR)
+        entity = new Door(meta);
     else
         throw new Error("entity type is not defined");
     return entity;
@@ -66,6 +69,9 @@ const chats = [];
  * @param {Client} client 
  */
 export default function activity(client) {
+
+    let ping_ms = 0;
+
     setInterval(render, 50);
     clientData.onKeyEvent = (keyData) => {
         if (keyData != null)
@@ -94,7 +100,7 @@ export default function activity(client) {
             return acc;
         }, {});
         for (const id in clientData.entities) {
-            if (rawEntities[id] == null && clientData.entities[id].meta.isStatic == false) {
+            if (rawEntities[id] == null && clientData.entities[id].meta.type !== entityType.WALL) {
                 removeEntity(clientData.entities[id]);
             }
         }
@@ -117,7 +123,6 @@ export default function activity(client) {
         client.send("chat", x.currentTarget.value);
     });
 
-    let ping_ms = 0;
 
     client.addEventListener("pong", ({ connId, payload }) => {
         let elapsed_time = Date.now() - ping_ms;

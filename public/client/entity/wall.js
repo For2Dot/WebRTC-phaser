@@ -8,7 +8,7 @@ export default class Wall extends Entity {
         this.entityType = entityType.ENTITY;
         this.setMeta(meta);
         this.images = [
-            new Phaser.GameObjects.Image(clientData.scene, 0, 0, "ship"),
+            new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'wall'),
         ];
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
@@ -23,6 +23,6 @@ export default class Wall extends Entity {
     }
 
     static prelodad(scene) {
-        scene.load.image('ship', '../assets/images/ship.png');
+        scene.load.image('wall', '../assets/images/wall.png');
     }
 }

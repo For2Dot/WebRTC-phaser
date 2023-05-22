@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { input, entityType } from "../../constant.js";
+import { constant, input, entityType } from "../../constant.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0) {
@@ -22,18 +22,35 @@ export class Player extends Entity {
         const y = dy * sprint * delta * this.speed;
 
         if (this.key[input.INTERACT])
-            console.log("interact");
+            this.interact();
         else
+        {
+            this.body.collided = [];
             Matter.Body.setVelocity(this.body, { x, y });
+        }
     }
 
     toDTO() {
         return {
             ...super.toDTO(),
+            y: this.body.position.y - 7,
             type: this.entityType,
             connId: this.connId,
             isSprint: this.key[input.SPRINT],
             isFire: false, // TODO
         }
+    }
+
+    interact() {
+        if (this.body.collided.length === 0)
+            return;
+        this.body.collided.forEach(entity => {
+            if (entity.entityType === entityType.DOOR)
+            {
+                console.log(entity.body.id);
+                entity.toggle();
+            }
+        });
+        this.key[input.INTERACT] = false;
     }
 }

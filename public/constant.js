@@ -4,6 +4,7 @@ export const input = {
     DOWN: "down",
     RIGHT: "right",
     SPRINT: "sprint",
+    INTERACT: "interact",
 }
 
 export const playerType = {
@@ -16,6 +17,7 @@ export const entityType = {
     PLAYER: "player",
     TESTBALL: "testBall",
     WALL: "wall",
+    DOOR: "door",
 }
 
 export const constant = {
