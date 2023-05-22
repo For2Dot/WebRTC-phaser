@@ -63,7 +63,7 @@ export default function activity(server) {
             for (let x = 0; x < width; ++x){
                 const tileId = targetLayer.data[x + y * width];
                 if (tileId !== 0)
-                    addEntity(new Wall(x * constant.blockCenter, y * constant.blockCenter, tileId));
+                    addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
             }
         }
 

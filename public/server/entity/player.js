@@ -9,10 +9,12 @@ export class Player extends Entity {
         this.entityType = entityType.PLAYER;
         this.body.label = entityType.PLAYER;
         this.connId = connId;
-        this.speed = 50;
+        this.speed = 5;
         this.key = {};
         this.engine = engine;
         this.isFire = false;
+        this.isSprint = false;
+        this.sprintValue = 1;
         this.dx = 1;
         this.dy = 0;
         this.stamina = constant.maximumStamina;
@@ -28,22 +30,18 @@ export class Player extends Entity {
         const isDown = this.key[input.DOWN];
         const isUp = this.key[input.UP];
         // const sprint = this.key[input.SPRINT] ? 2 : 1;
-        let sprint = 1;
-        if (this.key[input.SPRINT] && this.stamina > constant.mininumStamina){
-            this.stamina -= constant.sprintStamina;
-            sprint = 2;
-        }
-        else if (this.stamina < constant.maximumStamina)
+
+        if (this.stamina < constant.maximumStamina)
             this.stamina += constant.recoveryStaminaPerFrame;
         console.log(this.stamina);
-        this.isFire = this.key[input.FIRE] ? 1 : 0;
+
+        this.isFire = this.key[input.FIRE] ? this.fire() : this.notFire();
+        this.isSprint = this.key[input.SPRINT] ? this.sprint() : this.notSprint();
         const dx = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
         const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
-        const x = dx * sprint * delta * this.speed;
-        const y = dy * sprint * delta * this.speed;
+        const x = dx * this.sprintValue * delta * this.speed;
+        const y = dy * this.sprintValue * delta * this.speed;
         Matter.Body.setVelocity(this.body, { x, y });
-        if (this.isFire)
-            this.fire();
         if (dx === 0 && dy === 0)
             return ;
         this.dx = dx;
@@ -52,9 +50,9 @@ export class Player extends Entity {
 
     fire(){
         if (this.playerType === playerType.THIEF)
-            return ;
-        if (this.stamina < constant.requireStaminaForFire)
-            return ;
+            return (false);
+        if (this.stamina < constant.fireStamina)
+            return (false);
         this.stamina -= constant.fireStamina;
         const {x: bx, y: by} = this.body.position;
         const x = bx + (Math.cos(this.body.angle) * 10);
@@ -67,6 +65,28 @@ export class Player extends Entity {
             x: this.dx * 0.09,
             y: this.dy * 0.09,
         },);
+        return (true);
+    }
+
+    notFire(){
+        return (false);
+    }
+
+    sprint(){
+        // if (this.playerType === playerType.POLICE)
+        //     return (false);
+        if (this.stamina < constant.sprintStamina){
+            this.sprintValue = 1;
+            return (false);
+        }
+        this.stamina -= constant.sprintStamina;
+        this.sprintValue = 10;
+        return (true);
+    }
+
+    notSprint(){
+        this.sprintValue = 1;
+        return (false);
     }
 
     damagedByBullet(){
@@ -82,7 +102,8 @@ export class Player extends Entity {
             ...super.toDTO(),
             type: this.entityType,
             connId: this.connId,
-            isSprint: this.key[input.SPRINT],
+            isSprint: this.isSprint,
+            isFire: this.isFire,
             playerType: this.playerType,
             isFire: this.isFire,
         }

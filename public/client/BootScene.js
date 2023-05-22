@@ -75,6 +75,21 @@ export default class BootScene extends Phaser.Scene {
 		}
 	}
 
+	makeBar(x, y){
+		let bar = this.add.graphics();
+		bar.fillStyle(0x2ecc71, 1);
+		bar.fillRect(0, 0, 200, 50);
+
+		bar.x = x;
+		bar.y = y;
+
+		return bar;
+	}
+
+	setBarValue(bar, percentage){
+		bar.scaleX = percentage / 100;
+	}
+
 	update() {
 		if (this.mine != null) {
 			this.updateVisionMask(+this.mine.x, +this.mine.y);

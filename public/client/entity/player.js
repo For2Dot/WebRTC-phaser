@@ -7,7 +7,7 @@ export default class Player extends Entity {
 		super(meta);
 		this.entityType = entityType.PLAYER;
 		this.playerType = this.meta.playerType;
-		// this.body.type = entityType.PLAYER;
+		this.stamina = this.meta.stamina;
 		this.images = [
 			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "female", "townsfolk_f_idle_1"),
 		];
