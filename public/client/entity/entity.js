@@ -7,6 +7,7 @@ export default class Entity {
         this.beforeMeta = null;
         this.meta = meta;
         this.gameObject = clientData.scene.add.group();
+        this.isInVisionMask = false;
     }
 
     getGameObject() {
