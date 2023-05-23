@@ -1,12 +1,16 @@
 import { Entity } from "./entity.js";
-import { constant, entityType, input } from "../../constant.js";
+import { constant, entityType, input, bodyCategory, bodyLabel } from "../../constant.js";
+import { serverData } from "../server.js";
 
 export class Door extends Entity {
     constructor(x, y, code) {
         super(Matter.Bodies.rectangle(x, y,
             constant.blockCenter,
             constant.blockCenter,
-            { isStatic: true },
+            {
+                isStatic: true,
+                collisionFilter: { category: bodyCategory.SENSOR_TARGET }
+            },
         ));
         this.entityType = entityType.DOOR;
         this.body.label = entityType.DOOR;
@@ -43,7 +47,14 @@ export class Door extends Entity {
         }
     }
 
-    onCollision(target) {
+    /**
+     * @param {Matter.Body} myBody 
+     * @param {Matter.Body} targetBody 
+     */
+    onCollision(myBody, targetBody) {
+        if (targetBody.label !== bodyLabel.PLAYER_SENSOR)
+            return;
+        const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
             this.interact();
     };

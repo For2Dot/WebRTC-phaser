@@ -1,10 +1,12 @@
 import { Entity } from "./entity.js";
-import { constant, entityType, input } from "../../constant.js";
-import { serverService } from "../server.js";
+import { bodyCategory, bodyLabel, constant, entityType, input } from "../../constant.js";
+import { serverData } from "../server.js";
 
 export class Generator extends Entity {
     constructor(x, y, code) {
-        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, { isStatic: true }));
+        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, { isStatic: true, collisionFilter: {
+            category: bodyCategory.SENSOR_TARGET,
+        }}));
         this.entityType = entityType.GENERATOR;
         this.body.label = entityType.GENERATOR;
         this.wallCode = code;
@@ -74,7 +76,14 @@ export class Generator extends Entity {
         }
     }
 
-    onCollision(target) {
+    /**
+     * @param {Matter.Body} myBody 
+     * @param {Matter.Body} targetBody 
+     */
+    onCollision(myBody, targetBody) {
+        if (targetBody.label !== bodyLabel.PLAYER_SENSOR)
+            return;
+        const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
             this.interact();
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == false)

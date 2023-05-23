@@ -1,6 +1,7 @@
 import { entityType } from "../../constant.js";
 
 export class Entity {
+    static nextGroupId = -1;
     /**
      * @param {Matter.Body} body 
      */
@@ -28,5 +29,19 @@ export class Entity {
             y: this.body.position.y,
             isStatic: this.isStatic,
         }
+    }
+
+    /**
+     * @param {Matter.Body} myBody 
+     * @param {Matter.Body} targetBody 
+     */
+    onCollision(myBody, targetBody) {
+    }
+
+    /**
+     * @returns {number}
+     */
+    static getNextGroupId() {
+        return Entity.nextGroupId--;
     }
 }
