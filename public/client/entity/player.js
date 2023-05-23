@@ -10,6 +10,7 @@ export default class Player extends Entity {
 		this.stamina = this.meta.stamina;
 		this.images = [
 			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "female", "townsfolk_f_idle_1"),
+			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "my_bar"),
 		];
 		this.images.forEach(x => {
 			clientData.scene.add.existing(x);
@@ -18,6 +19,8 @@ export default class Player extends Entity {
 		this.images[0].setMask(clientData.visionMask);
 		this.lastFootprint = Date.now();
 		this.lastFire = Date.now();
+		this.images[1].depth = 1;
+		this.images[1].scaleY = .5;
 	}
 
 	static prelodad(scene) {
@@ -25,6 +28,7 @@ export default class Player extends Entity {
 		scene.load.image("footprint", '../assets/images/footprint.png');
 		scene.load.image("circle", '../assets/images/circle.png');
 		scene.load.image("bullet", '../assets/images/ship.png');
+		scene.load.image("my_bar", '../assets/images/bar.png');
 	}
 
 	/**
@@ -67,9 +71,17 @@ export default class Player extends Entity {
 		setTimeout(createParticle, 600);
 	}
 
+	updateMybar()
+	{
+		this.images[1].x = this.x;
+		this.images[1].y = this.y + 16;
+		this.images[1].scaleX = this.meta.stamina / constant.maximumStamina;
+	}
+
 	update() {
 		super.update();
 		this.updateFootprint();
 		this.updateFireBulletFx();
+		this.updateMybar();
 	}
 }
