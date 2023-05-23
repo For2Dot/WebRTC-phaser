@@ -18,17 +18,18 @@ export default class Generator extends Entity {
         });
         this.images[1].setVisible(false);
         this.images[2].setVisible(false);
-        this.genLevel = 0;
+        this.progressRate = 0;
+        this.lastBlinked = Date.now();
     }
 
     setMeta(meta) {
         super.setMeta(meta);
         this.code = meta.code;
-        if (this.genLevel == null)
+        if (this.progressRate == null)
             return ;
-        if (this.genLevel !== meta.genLevel)
+        if (this.progressRate != meta.progressRate)
         {
-            this.genLevel = meta.genLevel;
+            this.progressRate = meta.progressRate;
             this.toggleImage();
         }
     }
@@ -39,17 +40,28 @@ export default class Generator extends Entity {
         scene.load.image('gen100', '../assets/images/gen100.png');
     }
 
+    blink(image, progressRate) {
+        const now = Date.now();
+        const duration = 700 - progressRate * 5;
+
+        if (now - this.lastBlinked < duration)
+            return ;
+        this.lastBlinked = now;
+        image.setVisible(true);
+        setTimeout(() => {
+            image.setVisible(false);
+        }, duration / 2);
+    }
+
     toggleImage() {
         this.gameObject.clear();
-        if (this.genLevel == 0) {
+        if (this.progressRate <= 0) {
             this.images[0].setVisible(true);
             this.images[1].setVisible(false);
             this.images[2].setVisible(false);
-        } else if (this.genLevel == 1) {
-            this.images[0].setVisible(false);
-            this.images[1].setVisible(true);
-            this.images[2].setVisible(false);
-        } else if (this.genLevel == 2) {
+        } else if (this.progressRate > 0 && this.progressRate < 100)
+            this.blink(this.images[1], this.progressRate);
+        else if (this.progressRate >= 100) {
             this.images[0].setVisible(false);
             this.images[1].setVisible(false);
             this.images[2].setVisible(true);

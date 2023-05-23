@@ -20,5 +20,6 @@ export class Bullet extends Entity {
         setTimeout(() => {
             serverService.removeEntity(this);
         }, 1000);
+        console.log(this.body.id, this.body);
     }
 }

@@ -1,11 +1,11 @@
 import { Entity } from "./entity.js";
-import { input, entityType,  playerType, constant } from "../../constant.js";
+import { input, entityType, playerType, constant } from "../../constant.js";
 import { Bullet } from "./bullet.js";
 import { serverService } from "../server.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0, isPolice = 0) {
-        super(Matter.Bodies.circle(x, y, 10));
+        super(Matter.Bodies.circle(x, y, 8));
 
         this.entityType = entityType.PLAYER;
         this.connId = connId;
@@ -22,6 +22,7 @@ export class Player extends Entity {
         this.playerType = isPolice ? playerType.POLICE : playerType.THIEF;
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
+        this.body.collided = [];
     }
 
     update(delta) {
@@ -46,25 +47,25 @@ export class Player extends Entity {
 
         if (this.key[input.INTERACT])
             this.interact();
-        else{
+        else {
             this.body.collided = [];
             Matter.Body.setVelocity(this.body, { x, y });
         }
 
         if (dx === 0 && dy === 0)
-            return ;
+            return;
         this.dx = dx;
         this.dy = dy;
-      
+
     }
 
-    fire(){
+    fire() {
         if (this.playerType === playerType.THIEF)
             return (false);
         if (this.stamina < constant.fireStamina)
             return (false);
         this.stamina -= constant.fireStamina;
-        const {x: bx, y: by} = this.body.position;
+        const { x: bx, y: by } = this.body.position;
         const x = bx + (Math.cos(this.body.angle) * 10);
         const y = by + (Math.sin(this.body.angle) * 10);
 
@@ -72,7 +73,7 @@ export class Player extends Entity {
         return (true);
     }
 
-    notFire(){
+    notFire() {
         return (false);
     }
 
@@ -89,17 +90,17 @@ export class Player extends Entity {
         return (true);
     }
 
-    notSprint(){
+    notSprint() {
         this.sprintValue = 1;
         return (false);
     }
 
-    damagedByBullet(){
+    damagedByBullet() {
         ++this.slowTime;
         this.speed = 10;
     }
 
-    recovred(){
+    recovred() {
         this.slowTime = 0;
         this.speed = 50;
     }
@@ -108,7 +109,6 @@ export class Player extends Entity {
         if (this.body.collided.length === 0)
             return;
         this.body.collided.forEach(entity => entity.interact());
-        this.key[input.INTERACT] = false;
     }
 
     toDTO() {
@@ -123,4 +123,5 @@ export class Player extends Entity {
             stamina: this.stamina,
         }
     }
+
 }
