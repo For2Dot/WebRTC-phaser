@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { entityType } from "../../constant.js";
+import { entityType, playerType } from "../../constant.js";
 import { serverService } from "../server.js";
 
 export class Bullet extends Entity {
@@ -20,5 +20,10 @@ export class Bullet extends Entity {
         setTimeout(() => {
             serverService.removeEntity(this);
         }, 1000);
+    }
+
+    onCollision(target){
+        if (target.playerType !== playerType.POLICE)
+            serverService.removeEntity(this);
     }
 }

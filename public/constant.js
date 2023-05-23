@@ -29,7 +29,7 @@ export const gameResultType = {
 }
 
 export const constant = {
-    playerCnt: 2,
+    playerCnt: 1,
     clientLerp: 0.3,
     clientZoom: 2,
     keyMap: [

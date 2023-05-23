@@ -11,13 +11,18 @@ export default class Generator extends Entity {
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'gen0'),
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'gen50'),
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'gen100'),
+            new Phaser.GameObjects.Text(clientData.scene, 0, 0, ``, { color: '#ffffff', fontSize: '13px', backgroundColor: '#000000' }),
         ];
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
             this.gameObject.add(x);
+            x.setMask(clientData.visionMask);
+            x.setVisible(false);
         });
-        this.images[1].setVisible(false);
-        this.images[2].setVisible(false);
+        this.images[3].depth = 2;
+        this.images[3].alpha = 1;
+        this.images[3].setScale(0.5, 0.5);
+
         this.progressRate = 0;
         this.lastBlinked = Date.now();
     }
@@ -26,9 +31,8 @@ export default class Generator extends Entity {
         super.setMeta(meta);
         this.code = meta.code;
         if (this.progressRate == null)
-            return ;
-        if (this.progressRate != meta.progressRate)
-        {
+            return;
+        if (this.progressRate != meta.progressRate) {
             this.progressRate = meta.progressRate;
             this.toggleImage();
         }
@@ -45,7 +49,7 @@ export default class Generator extends Entity {
         const duration = 700 - progressRate * 5;
 
         if (now - this.lastBlinked < duration)
-            return ;
+            return;
         this.lastBlinked = now;
         image.setVisible(true);
         setTimeout(() => {
@@ -59,13 +63,22 @@ export default class Generator extends Entity {
             this.images[0].setVisible(true);
             this.images[1].setVisible(false);
             this.images[2].setVisible(false);
-        } else if (this.progressRate > 0 && this.progressRate < 100)
+            this.images[3].setVisible(false);
+        } else if (this.progressRate > 0 && this.progressRate < 100) {
+            this.images[3].setVisible(true);
             this.blink(this.images[1], this.progressRate);
+        }
         else if (this.progressRate >= 100) {
+            this.progressRate = 100;
             this.images[0].setVisible(false);
             this.images[1].setVisible(false);
             this.images[2].setVisible(true);
+            this.images[3].setVisible(false);
         }
+        // update percentage text
+        this.images[3].text = `${this.progressRate}%`;
+        this.images[3].x = this.x - 4;
+        this.images[3].y = this.y - 10;
     }
 
 }
