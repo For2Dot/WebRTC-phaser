@@ -182,7 +182,7 @@ export default function activity(server) {
                 if (x.bodyA.label === playerType.THIEF)
                     bodyA.slowTime = 1;
             }
-            else if ((x.bodyA.label === playerType.POLICE || x.bodyA.label ===  playerType.POLICE )
+            else if ((x.bodyA.label === playerType.POLICE || x.bodyA.label === playerType.THIEF )
                     && x.bodyB.label !== entityType.WALL)
                 if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
                     bodyA.body.collided.push(bodyB);
