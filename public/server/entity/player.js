@@ -5,7 +5,7 @@ import { serverService } from "../server.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0, isPolice = 0) {
-        super(Matter.Bodies.circle(x, y, 10));
+        super(Matter.Bodies.circle(x, y, 8));
 
         this.entityType = entityType.PLAYER;
         this.connId = connId;
@@ -125,6 +125,6 @@ export class Player extends Entity {
         if (this.body.collided.length === 0)
             return;
         this.body.collided.forEach(entity => entity.interact());
-        this.key[input.INTERACT] = false;
+        // this.key[input.INTERACT] = false;
     }
 }
