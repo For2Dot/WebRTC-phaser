@@ -24,7 +24,7 @@ export const entityType = {
 }
 
 export const constant = {
-    playerCnt: 1,
+    playerCnt: 2,
     clientLerp: 0.3,
     clientZoom: 2,
     keyMap: [
