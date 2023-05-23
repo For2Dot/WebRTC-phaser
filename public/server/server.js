@@ -24,6 +24,11 @@ export const serverData = {
      * @type {Array<Entity>}
     */
     entities: [],
+
+    /**
+     * @type {Object<number, Entity>}
+     */
+    entityMap: {},
 };
 
 export const serverService = {
@@ -45,7 +50,10 @@ export default function activity(server) {
      * @param {Entity} entity 
      */
     serverService.addEntity = (entity) => {
+        if (entity.body == null || entity.body.id == null)
+            return;
         serverData.entities.push(entity);
+        serverData.entityMap[entity.body.id] = entity;
         if (entity.entityType == entityType.PLAYER) {
             serverData.players.push(entity);
             serverData.playerMapByConnId[entity.connId] = entity;
@@ -59,11 +67,12 @@ export default function activity(server) {
      * @param {Entity} entity 
      */
     serverService.removeEntity = (entity) => {
-        if (serverData.entities.find(x => x === entity) == null)
+        if (serverData.entityMap[entity.body.id] == null)
             return;
         serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
+        delete serverData.entityMap[entity.body.id];
         if (entity.entityType === entityType.PLAYER) {
-            serverData.players = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
+            serverData.players = serverData.players.filter(x => x.body.id !== entity?.body?.id);
             delete serverData.playerMapByConnId[entity.connId];
         }
         if (entity.appendToEngine)
@@ -165,27 +174,10 @@ export default function activity(server) {
 
     Matter.Events.on(engine, "collisionStart", (event) => {
         event.pairs.forEach(x => {
-            const bodyAident = x.bodyA.id;
-            const bodyBident = x.bodyB.id;
-            const bodyA = serverData.entities.find(x => x.body.id === bodyAident);
-            const bodyB = serverData.entities.find(x => x.body.id === bodyBident);
-
-            if (x.bodyA.label === entityType.BULLET) {
-                if (x.bodyB.label !== playerType.POLICE)
-                    serverService.removeEntity(bodyA);
-                if (x.bodyB.label === playerType.THIEF)
-                    bodyB.slowTime = 1;
-            }
-            else if (x.bodyB.label === entityType.BULLET) {
-                if (x.bodyA.label !== playerType.POLICE)
-                    serverService.removeEntity(bodyB);
-                if (x.bodyA.label === playerType.THIEF)
-                    bodyA.slowTime = 1;
-            }
-            else if ((x.bodyA.label === playerType.POLICE || x.bodyA.label === playerType.THIEF )
-                    && x.bodyB.label !== entityType.WALL)
-                if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
-                    bodyA.body.collided.push(bodyB);
+            if (serverData.entityMap[x.bodyA.id] != null && serverData.entityMap[x.bodyA.id].onCollision != null)
+                serverData.entityMap[x.bodyA.id].onCollision(x.bodyB);
+            if (serverData.entityMap[x.bodyB.id] != null && serverData.entityMap[x.bodyB.id].onCollision != null)
+                serverData.entityMap[x.bodyB.id].onCollision(x.bodyA);
         });
     });
 
