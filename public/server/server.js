@@ -175,9 +175,9 @@ export default function activity(server) {
     Matter.Events.on(engine, "collisionStart", (event) => {
         event.pairs.forEach(x => {
             if (serverData.entityMap[x.bodyA.id] != null && serverData.entityMap[x.bodyA.id].onCollision != null)
-                serverData.entityMap[x.bodyA.id].onCollision(x.bodyB);
+                serverData.entityMap[x.bodyA.id].onCollision(serverData.entityMap[x.bodyB.id]);
             if (serverData.entityMap[x.bodyB.id] != null && serverData.entityMap[x.bodyB.id].onCollision != null)
-                serverData.entityMap[x.bodyB.id].onCollision(x.bodyA);
+                serverData.entityMap[x.bodyB.id].onCollision(serverData.entityMap[x.bodyA.id]);
         });
     });
 
