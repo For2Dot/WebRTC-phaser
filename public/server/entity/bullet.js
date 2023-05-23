@@ -21,8 +21,4 @@ export class Bullet extends Entity {
             serverService.removeEntity(this);
         }, 1000);
     }
-
-	collisionEvent(){
-		serverService.removeEntity(this);
-	}
 }
