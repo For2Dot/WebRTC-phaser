@@ -1,5 +1,5 @@
 import { Client } from "../server/webrtc.js";
-import { constant, entityType, playerType } from "../constant.js";
+import { constant, entityType, gameResultType, playerType } from "../constant.js";
 import Entity from "./entity/entity.js";
 import Player from "./entity/player.js";
 import TestBall from "./entity/testBall.js";
@@ -77,6 +77,7 @@ const chats = [];
 export default function activity(client) {
 
     let ping_ms = 0;
+    let startTime = null;
 
     setInterval(render, 50);
     clientData.onKeyEvent = (keyData) => {
@@ -97,7 +98,8 @@ export default function activity(client) {
     client.addEventListener("start", ({ connId, payload }) => {
         clientData.connId = connId;
         clientData.isStarted = true;
-        client.send("start")
+        startTime = payload;
+        client.send("start");
     });
 
     client.addEventListener("frame", ({ connId, payload }) => {
@@ -125,6 +127,14 @@ export default function activity(client) {
         chats.find(chat => chat.id === payload.id).chat = payload.chat;
     });
 
+    client.addEventListener("end", ({ connId, payload }) => {
+        const me = clientData.players.find(x => x.meta.connId === clientData.connId);
+        if (me != null) {
+            const win = me.meta.gameResultType === gameResultType.WIN;
+            alert("You " + (win ? "win" : "lose"));
+        }
+    });
+
     document.getElementById("message").addEventListener("input", (x) => {
         client.send("chat", x.currentTarget.value);
     });
@@ -138,6 +148,11 @@ export default function activity(client) {
     setInterval(() => {
         ping_ms = Date.now();
         client.send("ping");
+        if (clientData.isStarted) {
+            let leftTime = (startTime + constant.gameoverTime * 1000) - Date.now();
+            leftTime = leftTime < 0 ? 0 : leftTime;
+            document.getElementById("left-time").innerText = `남은시간: ${Math.floor(leftTime * 0.001)}`;
+        }
     }, 1000);
 }
 

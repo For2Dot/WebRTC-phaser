@@ -23,6 +23,11 @@ export const entityType = {
     BULLET: "bullet",
 }
 
+export const gameResultType = {
+    WIN: "win",
+    LOSE: "lose",
+}
+
 export const constant = {
     playerCnt: 2,
     clientLerp: 0.3,
@@ -44,4 +49,5 @@ export const constant = {
     sprintStamina: 50,
     fireStamina: 100,
     maximumStamina: 100,
+    gameoverTime: 300,
 }

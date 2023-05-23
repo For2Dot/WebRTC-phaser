@@ -45,6 +45,12 @@ export default function activity(server) {
     const runner = Matter.Runner.create();
     const lastPing = {};
     let updateCounter = 0;
+    let startTime = null;
+
+    const gameover = () => {
+        Matter.Runner.stop(runner);
+        server.broadcast("end", null);
+    }
 
     /**
      * @param {Entity} entity 
@@ -104,6 +110,7 @@ export default function activity(server) {
 
             Matter.Body.setPosition(player.body, { x, y });
         });
+        startTime = Date.now();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
         Matter.Runner.run(runner, engine);
     }
@@ -138,7 +145,7 @@ export default function activity(server) {
                         return;
                     }
                     init();
-                    server.broadcast("start", constant.playerCnt);
+                    server.broadcast("start", startTime);
                     server.broadcast("chat", { id: "System", chat: "game started!" });
                     startBtn.style.display = "none";
                 }
@@ -156,6 +163,9 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
+        if (startTime + constant.gameoverTime * 1000 < Date.now()) {
+            gameover();
+        }
         const delta = source.delta * 0.001;
         serverData.entities.forEach((entity) => entity.update(delta));
     });

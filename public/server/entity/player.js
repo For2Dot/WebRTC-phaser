@@ -146,6 +146,7 @@ export class Player extends Entity {
             playerType: this.playerType,
             stamina: this.stamina,
             isPrision: this.isPrision,
+            gameResultType: this.gameResultType,
         }
     }
 

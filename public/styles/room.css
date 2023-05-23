@@ -20,7 +20,7 @@ body {
 
 #chat-panel {
     position: absolute;
-    width: 400px;
+    width: 480px;
     resize: both;
     align-items: stretch; 
 }
@@ -68,7 +68,7 @@ body {
     color: azure;
 }
 
-#ping {
+span {
     color: azure;
 }
 
