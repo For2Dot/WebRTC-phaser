@@ -23,9 +23,18 @@ export class Player extends Entity {
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
         this.body.collided = [];
+        this.isPrision = false;
     }
 
     update(delta) {
+        console.log(this.isPrision);
+        if (this.isPrision){
+            Matter.Body.setVelocity(this.body, {
+                x: 0,
+                y: 0,
+            },);
+            return ;
+        }
         const isRight = this.key[input.RIGHT];
         const isLeft = this.key[input.LEFT];
         const isDown = this.key[input.DOWN];
@@ -111,6 +120,21 @@ export class Player extends Entity {
         this.body.collided.forEach(entity => entity.interact());
     }
 
+    onCollision(target){
+        if (this.playerType === playerType.THIEF && target.entityType === entityType.BULLET)
+            this.slowTime = 1;
+        else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){
+            if (this.isPrision) return ;
+            this.isPrision = true;
+            this.body.isSensor = true;
+        }
+        else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
+            if (!this.isPrision) return ;
+            this.isPrision = false;
+            this.body.isSensor = false;
+        }
+    }
+
     toDTO() {
         return {
             ...super.toDTO(),
@@ -121,6 +145,7 @@ export class Player extends Entity {
             isFire: this.isFire,
             playerType: this.playerType,
             stamina: this.stamina,
+            isPrision: this.isPrision,
         }
     }
 

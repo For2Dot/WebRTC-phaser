@@ -12,7 +12,6 @@ export class Entity {
         this.entityType = entityType.ENTITY;
         this.appendToEngine = true;
         this.isStatic = false;
-        this.onCollision = null;
     }
 
     /**
