@@ -23,7 +23,7 @@ export default class Player extends Entity {
 		if (this.meta.connId == clientData.connId)
 		{
 			this.images[1].depth = 1;
-			this.images[1].scaleY = .5;
+			this.images[1].scaleY = 0.5;
 		}
 	}
 

@@ -19,6 +19,7 @@ export const entityType = {
     TESTBALL: "testBall",
     WALL: "wall",
     DOOR: "door",
+    EVDOOR: "elevatorDoor",
     GENERATOR: "generator",
     BULLET: "bullet",
 }

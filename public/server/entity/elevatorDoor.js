@@ -1,19 +1,21 @@
 import { Entity } from "./entity.js";
+import { serverData } from '../server.js';
 import { constant, entityType, input } from "../../constant.js";
 
-export class Door extends Entity {
+export class ElevatorDoor extends Entity {
     constructor(x, y, code) {
         super(Matter.Bodies.rectangle(x, y,
             constant.blockCenter,
             constant.blockCenter,
             { isStatic: true },
         ));
-        this.entityType = entityType.DOOR;
-        this.body.label = entityType.DOOR;
+        this.entityType = entityType.EVDOOR;
+        this.body.label = entityType.EVDOOR;
         this.wallCode = code;
         this.isStatic = true;
         this.isOpened = false;
         this.lastSwitched = Date.now();
+        this.alertIsOn = false;
     }
 
     toDTO() {
@@ -22,6 +24,7 @@ export class Door extends Entity {
             width: constant.blockCenter,
             height: constant.blockCenter,
             isOpened: this.isOpened,
+            alertIsOn: this.alertIsOn,
         }
     }
 
@@ -37,14 +40,29 @@ export class Door extends Entity {
 
     interact() {
         const now = Date.now();
-        if (now - this.lastSwitched > 500) {
+        if (now - this.lastSwitched > 500)
+        {
             this.switchDoor();
             this.lastSwitched = now;
         }
     }
 
+    notReady() {
+        if (this.alertIsOn == true)
+            return;
+        this.alertIsOn = true;
+        setTimeout(()=> {
+            this.alertIsOn = false;
+        }, 1000)
+    }
+
     onCollision(target) {
-        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
-            this.interact();
+        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT])
+        {
+            if (serverData.electricity)
+                this.interact();
+            else
+                this.notReady();
+        }
     };
 }

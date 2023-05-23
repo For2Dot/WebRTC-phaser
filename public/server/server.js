@@ -1,10 +1,12 @@
 import { Server } from "./webrtc.js";
-import { constant, entityType, playerType, input } from "../constant.js";
+import { constant, entityType } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
 import { Wall } from "./entity/wall.js";
 import { Door } from "./entity/door.js";
 import { Generator } from "./entity/generator.js";
+import { ElevatorDoor } from "./entity/elevatordoor.js";
+import { Rule } from "./rule.js";
 
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
@@ -99,6 +101,8 @@ export default function activity(server) {
                     serverService.addEntity(new Door(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
                 else if (tileId === 3)
                     serverService.addEntity(new Generator(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
+                else if (tileId === 4)
+                    serverService.addEntity(new ElevatorDoor(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
             }
         }
 
@@ -110,6 +114,7 @@ export default function activity(server) {
 
             Matter.Body.setPosition(player.body, { x, y });
         });
+        serverData['rule'] = new Rule();
         startTime = Date.now();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
         Matter.Runner.run(runner, engine);
