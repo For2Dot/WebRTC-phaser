@@ -27,7 +27,6 @@ export const serverData = {
 };
 
 export const serverService = {
-    count: 1,
     addEntity: null,
     removeEntity: null,
 }
@@ -62,8 +61,6 @@ export default function activity(server) {
     serverService.removeEntity = (entity) => {
         if (serverData.entities.find(x => x === entity) == null)
             return;
-        else if (entity.entityType !== entityType.BULLET)
-            return;
         serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
         if (entity.entityType === entityType.PLAYER) {
             serverData.players = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
@@ -71,7 +68,6 @@ export default function activity(server) {
         }
         if (entity.appendToEngine)
             Matter.Composite.remove(engine.world, entity.body);
-        ++serverService.count;
     }
 
     const init = () => {
@@ -169,8 +165,10 @@ export default function activity(server) {
 
     Matter.Events.on(engine, "collisionStart", (event) => {
         event.pairs.forEach(x => {
-            const bodyA = serverData.entities[x.bodyA.id - 1];
-            const bodyB = serverData.entities[x.bodyB.id - 1];
+            const bodyAident = x.bodyA.id;
+            const bodyBident = x.bodyB.id;
+            const bodyA = serverData.entities.find(x => x.body.id === bodyAident);
+            const bodyB = serverData.entities.find(x => x.body.id === bodyBident);
 
             if (x.bodyA.label === entityType.BULLET) {
                 if (x.bodyB.label !== playerType.POLICE)

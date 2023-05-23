@@ -18,15 +18,10 @@ export class Player extends Entity {
         this.dx = 1;
         this.dy = 0;
         this.stamina = constant.maximumStamina;
-        if (isPolice) {
-            this.speed = 80;
-            this.playerType = playerType.POLICE;
-        }
-        else {
-            this.speed = 50;
-            this.playerType = playerType.THIEF;
-        }
+        this.speed = isPolice ? 80 : 50;
+        this.playerType = isPolice ? playerType.POLICE : playerType.THIEF;
         this.body.label = this.playerType;
+        this.lastSprintTime = Date.now();
         this.body.collided = [];
     }
 
@@ -36,15 +31,15 @@ export class Player extends Entity {
         const isDown = this.key[input.DOWN];
         const isUp = this.key[input.UP];
 
-        if (this.stamina < constant.maximumStamina)
+        if (this.lastSprintTime + 1000 < Date.now() && this.stamina < constant.maximumStamina)
             this.stamina += constant.recoveryStaminaPerFrame * delta;
         if (this.slowTime !== 0)
-            this.damagedByBullet();
+        this.damagedByBullet();
         if (this.slowTime > 400)
-            this.recovred();
-
-        this.isFire = this.key[input.FIRE] ? this.fire() : this.notFire();
-        this.isSprint = this.key[input.SPRINT] ? this.sprint() : this.notSprint();
+        this.recovred();
+        
+        this.isFire = this.key[input.FIRE] ? this.fire(delta) : this.notFire(delta);
+        this.isSprint = this.key[input.SPRINT] ? this.sprint(delta) : this.notSprint(delta);
         const dx = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
         const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
         const x = dx * this.sprintValue * delta * this.speed;
@@ -82,15 +77,16 @@ export class Player extends Entity {
         return (false);
     }
 
-    sprint() {
+    sprint(delta){
         if (this.playerType === playerType.POLICE)
             return (false);
-        if (this.stamina < constant.sprintStamina) {
+        if (this.stamina < constant.sprintStamina * delta){
             this.sprintValue = 1;
             return (false);
         }
-        this.stamina -= constant.sprintStamina;
+        this.stamina -= constant.sprintStamina * delta;
         this.sprintValue = 2;
+        this.lastSprintTime = Date.now();
         return (true);
     }
 
@@ -108,6 +104,12 @@ export class Player extends Entity {
         this.slowTime = 0;
         this.speed = 50;
     }
+    
+    interact() {
+        if (this.body.collided.length === 0)
+            return;
+        this.body.collided.forEach(entity => entity.interact());
+    }
 
     toDTO() {
         return {
@@ -118,13 +120,8 @@ export class Player extends Entity {
             isSprint: this.isSprint,
             isFire: this.isFire,
             playerType: this.playerType,
+            stamina: this.stamina,
         }
     }
 
-    interact() {
-        if (this.body.collided.length === 0)
-            return;
-        this.body.collided.forEach(entity => entity.interact());
-        // this.key[input.INTERACT] = false;
-    }
 }
