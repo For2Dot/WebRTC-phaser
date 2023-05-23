@@ -29,7 +29,6 @@ export const serverData = {
 };
 
 export const serverService = {
-    count: 1,
     addEntity: null,
     removeEntity: null,
 }
@@ -65,8 +64,6 @@ export default function activity(server) {
     serverService.removeEntity = (entity) => {
         if (serverData.entities.find(x => x === entity) == null)
             return;
-        else if (entity.entityType !== entityType.BULLET)
-            return ;
         serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
         if (entity.entityType === entityType.PLAYER) {
             serverData.players = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
@@ -74,7 +71,6 @@ export default function activity(server) {
         }
         if (entity.appendToEngine)
             Matter.Composite.remove(engine.world, entity.body);
-        ++serverService.count;
     }
 
     const init = () => {
@@ -171,49 +167,29 @@ export default function activity(server) {
     });
     
 
-    Matter.Events.on(engine, 'collisionStart', function(event) {
-        const pairs = event.pairs;
-
-        for (let i = 0; i < pairs.length; i++) {
-            const pair = pairs[i];
-            const bodyA = serverData.entities[pair.bodyA.id - 1];
-            const bodyB = serverData.entities[pair.bodyB.id - 1];
-
-            if (bodyA.entityType === entityType.PLAYER && bodyB.entityType !== entityType.WALL)
-            {
-                if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
-                {
-                    bodyA.body.collided.push(bodyB);
-                }
-            }
-        }
-    });
-  
-      Matter.Events.on(engine, "collisionStart", (event) =>{
-        console.log("Start collision");
+    Matter.Events.on(engine, "collisionStart", (event) => {
         event.pairs.forEach(x => {
-            const ai = x.bodyA.id;
-            const bi = x.bodyB.id;
-            if (x.bodyA.label === entityType.BULLET){
-                if (x.bodyB.label !== playerType.POLICE)
-                    serverService.removeEntity(serverData.entities[ai - serverService.count]);
-                if (x.bodyB.label === playerType.THIEF)
-                    serverData.entities[bi - 1].slowTime = 1;
-            }
-            else if (x.bodyB.label === entityType.BULLET){
-                if (x.bodyA.label !== playerType.POLICE)
-                    serverService.removeEntity(serverData.entities[bi - serverService.count]);
-                if (x.bodyA.label === playerType.THIEF)
-                    serverData.entities[ai - 1].slowTime = 1; 
-            }
-          
-            const bodyA = serverData.entities[ai - serverService.count];
-            const bodyB = serverData.entities[bi - serverService.count];
+            const bodyAident = x.bodyA.id;
+            const bodyBident = x.bodyB.id;
+            const bodyA = serverData.entities.find(x => x.body.id === bodyAident);
+            const bodyB = serverData.entities.find(x => x.body.id === bodyBident);
 
-            if (bodyA.entityType === entityType.PLAYER && bodyB.entityType !== entityType.WALL)
+            if (x.bodyA.label === entityType.BULLET) {
+                if (x.bodyB.label !== playerType.POLICE)
+                    serverService.removeEntity(bodyA);
+                if (x.bodyB.label === playerType.THIEF)
+                    bodyB.slowTime = 1;
+            }
+            else if (x.bodyB.label === entityType.BULLET) {
+                if (x.bodyA.label !== playerType.POLICE)
+                    serverService.removeEntity(bodyB);
+                if (x.bodyA.label === playerType.THIEF)
+                    bodyA.slowTime = 1;
+            }
+            else if ((x.bodyA.label === playerType.POLICE || x.bodyA.label ===  playerType.POLICE )
+                    && x.bodyB.label !== entityType.WALL)
                 if (bodyA.body.collided.find(x => x.body.id === bodyB.body.id) == null)
                     bodyA.body.collided.push(bodyB);
-            
         });
     });
     

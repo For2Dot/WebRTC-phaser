@@ -51,12 +51,11 @@ export class Player extends Entity {
       
         if (this.key[input.INTERACT])
             this.interact();
-        else
-        {
+        else{
             this.body.collided = [];
             Matter.Body.setVelocity(this.body, { x, y });
         }
-  
+
         if (dx === 0 && dy === 0)
             return ;
         this.dx = dx;
@@ -108,6 +107,13 @@ export class Player extends Entity {
         this.slowTime = 0;
         this.speed = 50;
     }
+    
+    interact() {
+        if (this.body.collided.length === 0)
+            return;
+        this.body.collided.forEach(entity => entity.interact());
+        this.key[input.INTERACT] = false;
+    }
 
     toDTO() {
         return {
@@ -119,12 +125,5 @@ export class Player extends Entity {
             isFire: this.isFire,
             playerType: this.playerType,
         }
-    }
-
-    interact() {
-        if (this.body.collided.length === 0)
-            return;
-        this.body.collided.forEach(entity => entity.interact());
-        this.key[input.INTERACT] = false;
     }
 }
