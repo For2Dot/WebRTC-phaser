@@ -22,12 +22,10 @@ export class Player extends Entity {
         this.playerType = isPolice ? playerType.POLICE : playerType.THIEF;
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
-        this.body.collided = [];
         this.isPrision = false;
     }
 
     update(delta) {
-        console.log(this.isPrision);
         if (this.isPrision){
             Matter.Body.setVelocity(this.body, {
                 x: 0,
@@ -54,12 +52,7 @@ export class Player extends Entity {
         const x = dx * this.sprintValue * delta * this.speed;
         const y = dy * this.sprintValue * delta * this.speed;
 
-        if (this.key[input.INTERACT])
-            this.interact();
-        else {
-            this.body.collided = [];
-            Matter.Body.setVelocity(this.body, { x, y });
-        }
+        Matter.Body.setVelocity(this.body, { x, y });
 
         if (dx === 0 && dy === 0)
             return;
@@ -112,12 +105,6 @@ export class Player extends Entity {
     recovred() {
         this.slowTime = 0;
         this.speed = 50;
-    }
-    
-    interact() {
-        if (this.body.collided.length === 0)
-            return;
-        this.body.collided.forEach(entity => entity.interact());
     }
 
     onCollision(target){

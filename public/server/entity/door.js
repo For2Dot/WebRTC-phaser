@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { constant, entityType } from "../../constant.js";
+import { constant, entityType, input } from "../../constant.js";
 
 export class Door extends Entity {
     constructor(x, y, code) {
@@ -43,4 +43,9 @@ export class Door extends Entity {
             this.lastSwitched = now;
         }
     }
+
+    onCollision(target) {
+        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
+            this.interact();
+    };
 }
