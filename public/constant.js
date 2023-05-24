@@ -58,7 +58,7 @@ export const constant = {
     blockCenter: 16,
     footPrintTimeInterval: 0.1,
     footPrintLife: 0.5,
-    recoveryStaminaPerFrame: 50,
+    recoveryStaminaPerFrame: 30,
     sprintStamina: 50,
     fireStamina: 100,
     maximumStamina: 100,

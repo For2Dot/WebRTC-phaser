@@ -74,7 +74,6 @@ export default class Player extends Entity {
 		};
 		setTimeout(createParticle, 0);
 		setTimeout(createParticle, 400);
-		setTimeout(createParticle, 600);
 	}
 
 	updateMybar()
