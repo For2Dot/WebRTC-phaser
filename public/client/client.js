@@ -132,12 +132,14 @@ export default function activity(client) {
 
     client.addEventListener("end", ({ connId, payload }) => {
         const me = clientData.players.find(x => x.meta.connId === clientData.connId);
-        if (me != null) {
-            const win = me.meta.gameResultType === gameResultType.WIN;
-            alert("You " + (win ? "win" : "lose"));
-        }
+        setTimeout(() => {
+            if (me != null) {
+                const win = me.meta.gameResultType === gameResultType.WIN;
+                alert("You " + (win ? "win" : "lose"));
+                window.history.back();
+            }
+        }, 1000);
 
-        window.history.back();
     });
 
     document.getElementById("message").addEventListener("input", (x) => {
