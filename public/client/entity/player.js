@@ -87,7 +87,7 @@ export default class Player extends Entity {
 
 	updateJail()
 	{
-		if (this.meta.isPrision)
+		if (this.meta.isImprisoned)
 			this.images[1].setVisible(true);
 		else
 			this.images[1].setVisible(false);

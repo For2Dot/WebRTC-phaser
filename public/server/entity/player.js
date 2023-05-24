@@ -150,8 +150,8 @@ export class Player extends Entity {
             this.slowTime = 1;
         else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){
             if (this.isImprisoned) return ;
-             this.imprison();
-             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
+            this.imprison();
+            me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
             if (!this.isImprisoned) return ;
