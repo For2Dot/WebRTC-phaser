@@ -87,7 +87,9 @@ class Network {
         if (this.isHost == false)
             return;
         this.socket.emit("freezeRoom", { roomId: this.roomId });
-        this.socket.close();
+        setTimeout(() => {
+            this.socket.close();
+        }, 100);
     }
 
     /**
@@ -337,7 +339,7 @@ export class Server extends Node {
      */
     freezeRoom() {
         if (this.net === null)
-            return;
+        return;
         this.net.freezeRoom();
     }
 

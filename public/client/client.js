@@ -136,6 +136,8 @@ export default function activity(client) {
             const win = me.meta.gameResultType === gameResultType.WIN;
             alert("You " + (win ? "win" : "lose"));
         }
+
+        window.history.back();
     });
 
     document.getElementById("message").addEventListener("input", (x) => {
@@ -152,7 +154,7 @@ export default function activity(client) {
         ping_ms = Date.now();
         client.send("ping");
         if (clientData.isStarted) {
-            let leftTime = (startTime + constant.gameoverTime * 1000) - Date.now();
+            let leftTime = (startTime + constant.gameOverTime * 1000) - Date.now();
             leftTime = leftTime < 0 ? 0 : leftTime;
             document.getElementById("left-time").innerText = `남은시간: ${Math.floor(leftTime * 0.001)}`;
         }

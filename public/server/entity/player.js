@@ -37,11 +37,12 @@ export class Player extends Entity {
         this.playerType = isPolice ? playerType.POLICE : playerType.THIEF;
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
-        this.isPrision = false;
+        this.isImprisoned = false;
+        this.isEscaped = false;
     }
 
     update(delta) {
-        if (this.isPrision){
+        if (this.isImprisoned){
             Matter.Body.setVelocity(this.body, {
                 x: 0,
                 y: 0,
@@ -122,6 +123,12 @@ export class Player extends Entity {
         this.speed = 50;
     }
 
+    imprison() {
+        this.isImprisoned = true;
+        this.body.isSensor = true;
+        serverService.rule.checkAlive(this);
+    }
+
     /**
      * @param {Matter.Body} myBody 
      * @param {Matter.Body} targetBody 
@@ -133,13 +140,13 @@ export class Player extends Entity {
         if (this.playerType === playerType.THIEF && target.entityType === entityType.BULLET)
             this.slowTime = 1;
         else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){
-            if (this.isPrision) return ;
-            this.isPrision = true;
-            this.body.isSensor = true;
+            if (this.isImprisoned) return ;
+            this.imprison();
+
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
-            if (!this.isPrision) return ;
-            this.isPrision = false;
+            if (!this.isImprisoned) return ;
+            this.isImprisoned = false;
             this.body.isSensor = false;
         }
     }
@@ -154,7 +161,7 @@ export class Player extends Entity {
             isFire: this.isFire,
             playerType: this.playerType,
             stamina: this.stamina,
-            isPrision: this.isPrision,
+            isImprisoned: this.isImprisoned,
             gameResultType: this.gameResultType,
         }
     }

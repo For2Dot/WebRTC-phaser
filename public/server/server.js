@@ -11,6 +11,8 @@ import { Rule } from "./rule.js";
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
 
+export const runner = Matter.Runner.create();
+
 export const serverData = {
     /**
      * @type {Object<string, Player>}
@@ -48,7 +50,6 @@ export const serverService = {
 export default function activity(server) {
     const noGravity = { x: 0, y: 0, scale: 0 }
     const engine = Matter.Engine.create({ gravity: noGravity });
-    const runner = Matter.Runner.create();
     const lastPing = {};
     let updateCounter = 0;
 
@@ -183,8 +184,8 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
-        if (serverService.rule.startTime + constant.gameoverTime * 1000 < Date.now())
-            serverService.rule.gameover();
+        if (serverService.rule.startTime + constant.gameOverTime * 1000 < Date.now())
+            serverService.rule.gameOver();
 
         const delta = source.delta * 0.001;
         serverData.entities.forEach((entity) => entity.update(delta));

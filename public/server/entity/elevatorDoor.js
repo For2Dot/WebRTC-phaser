@@ -31,20 +31,28 @@ export class ElevatorDoor extends Entity {
         }
     }
 
+    openDoor() {
+        this.body.isSensor = true;
+        this.isOpened = true;
+    }
+
+    closeDoor() {
+        this.body.isSensor = false;
+        this.isOpened = false;
+        serverService.rule.checkGameSet();
+        serverService.rule.resetGenerators();
+    }
+
     switchDoor() {
         if (Date.now() - this.lastSwitched < 1000) return;
         if (!serverService.rule.electricity) {
             this.sendAlert(1); // not ready
             return ;
         }
-        if (this.isOpened) {
-            this.body.isSensor = false;
-            this.isOpened = false;
-            serverService.rule.resetGenerators();
-        } else {
-            this.body.isSensor = true;
-            this.isOpened = true;
-        }
+
+        if (this.isOpened) this.closeDoor();
+        else this.openDoor();
+
         this.lastSwitched = Date.now();
     }
 
@@ -52,9 +60,7 @@ export class ElevatorDoor extends Entity {
         if (who === playerType.THIEF)
             this.switchDoor();
         else if (who === playerType.POLICE)
-        {
             this.sendAlert(2); // not allowed
-        }
     }
 
     sendAlert(alert) {
@@ -73,5 +79,10 @@ export class ElevatorDoor extends Entity {
         const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType === entityType.PLAYER && target.key[input.INTERACT])
             this.interact(target.playerType);
+            
+        if (target.entityType === entityType.PLAYER && target.key[input.INTERACT])
+            if (target.playerType === playerType.THIEF)
+                if (this.isOpened)
+                    target.isEscaped = true;
     };
 }
