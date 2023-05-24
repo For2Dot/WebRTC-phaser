@@ -8,8 +8,7 @@ import { Generator } from "./entity/generator.js";
 import { ElevatorDoor } from "./entity/elevatordoor.js";
 import { Rule } from "./rule.js";
 
-const tiles = await fetch("/assets/images/testmap.json")
-    .then(x => x.json());
+const tiles = await fetch("/assets/map.json").then(x => x.json());
 
 export const runner = Matter.Runner.create();
 
@@ -91,39 +90,21 @@ export default function activity(server) {
 
     const init = () => {
 
-        const targetLayer = tiles.layers[1];
-        const { width, height } = targetLayer;
-        for (let y = 0; y < height; ++y) {
-            for (let x = 0; x < width; ++x) {
-                const tileId = targetLayer.data[x + y * width];
-                if (tileId < 100 && tileId > 0){
-                    serverService.addEntity(new Wall((constant.blockCenter * x) + (constant.blockCenter * tileId) - (tileId * constant.blockCenter / 2),
-                                                    constant.blockCenter + (y * constant.blockCenter),
-                                                    constant.blockCenter * tileId, 
-                                                    constant.blockCenter,
-                                                    tileId));
-                }
-                else if (tileId < 0){
-                    serverService.addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
-                                                    (constant.blockCenter * y) + (constant.blockCenter * (-1 * tileId)) - ((-1 * tileId -1) * (constant.blockCenter / 2)),
-                                                    constant.blockCenter,
-                                                    constant.blockCenter * (-1 * tileId), 
-                                                    tileId));
-                }
-                else if (tileId === 102)
-                    serverService.addEntity(new Door(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
-                                                        constant.blockCenter + (y * constant.blockCenter),
-                                                        tileId));
-                else if (tileId === 103)
-                    serverService.addEntity(new Generator(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
-                                                        constant.blockCenter + (y * constant.blockCenter), 
-                                                        tileId));
-               else if (tileId === 104)
-                    serverService.addEntity(new ElevatorDoor(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
-                                                        constant.blockCenter + (y * constant.blockCenter),
-                                                        tileId)); 
-            }
-        }
+        tiles.map(r => {
+            const x = (r.rect[1].x + r.rect[0].x) * 0.5 * constant.blockCenter;
+            const y = (r.rect[1].y + r.rect[0].y) * 0.5 * constant.blockCenter;
+            const width = (r.rect[1].x - r.rect[0].x) * constant.blockCenter;
+            const height = (r.rect[1].y - r.rect[0].y) * constant.blockCenter;
+            const label = r.label;
+            if (label === "wall")
+                serverService.addEntity(new Wall(x, y, width, height));
+            if (label === "door")
+                serverService.addEntity(new Door(x, y, width, height));
+            if (label === "generator")
+                serverService.addEntity(new Generator(x, y, width, height));
+            if (label === "elevator")
+                serverService.addEntity(new ElevatorDoor(x, y, width, height));
+        });
 
         serverData.players.forEach((player, idx) => {
 

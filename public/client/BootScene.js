@@ -51,7 +51,7 @@ export default class BootScene extends Phaser.Scene {
 
 	updateVisionMask(x, y) {
 		const polygons = [];
-		polygons.push([[-1000, -1000], [1000, -1000], [1000, 1000], [-1000, 1000]]);
+		polygons.push([[-2000, -2000], [2000, -2000], [2000, 2000], [-2000, 2000]]);
 		for (const entityId in clientData.entities) {
 			if (clientData.entities[entityId].meta.type == entityType.WALL 
 				|| (clientData.entities[entityId].meta.type == entityType.DOOR && clientData.entities[entityId].isOpened == false)

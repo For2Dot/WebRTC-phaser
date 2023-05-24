@@ -1,7 +1,7 @@
 window.onbeforeunload = () => "edit";
 const blockSize = 16;
-const canvasWidth = blockSize * 50;
-const canvasHeight = blockSize * 30;
+const canvasWidth = blockSize * 80;
+const canvasHeight = blockSize * 40;
 const noGravity = { x: 0, y: 0, scale: 0 }
 const engine = Matter.Engine.create({ gravity: noGravity });
 const runner = Matter.Runner.create();
@@ -18,9 +18,11 @@ const render = Matter.Render.create({
 Matter.Render.run(render);
 const labels = [
     { key: "Digit1", color: "#AAA", name: "wall" },
-    { key: "Digit2", color: "#FF0", name: "generator" },
-    { key: "Digit3", color: "#0F0", name: "door" },
+    { key: "Digit2", color: "#0F0", name: "door" },
+    { key: "Digit3", color: "#FF0", name: "generator" },
     { key: "Digit4", color: "#00F", name: "elevator" },
+    { key: "Digit5", color: "#F0F", name: "police" },
+    { key: "Digit6", color: "#0FF", name: "thief" },
 ]
 let blocks = [];
 let stack = [];
