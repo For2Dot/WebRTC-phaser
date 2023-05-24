@@ -1,5 +1,6 @@
 import { Entity } from "./entity.js";
 import { constant, entityType, input } from "../../constant.js";
+import { serverService } from "../server.js";
 
 export class Generator extends Entity {
     constructor(x, y, code) {
@@ -23,6 +24,14 @@ export class Generator extends Entity {
             height: constant.blockCenter,
             progressRate: this.progressRate,
         }
+    }
+
+    reset() {
+        this.genProcess = 0;
+        this.genSpeed = 0;
+        this.progressRate = 0;
+        this.lastSwitched = Date.now();
+        this.isWorking = false;
     }
 
     generate() {
@@ -54,11 +63,12 @@ export class Generator extends Entity {
 
             if (this.genSpeed < 20)
                 this.genSpeed += 1;
-            this.genProcess += 1;
+            this.genProcess += 100;
 
             if (this.genProcess >= 1000) {
                 this.isWorking = true;
                 this.genProcess = 1000;
+                serverService.rule.checkGenerator();
             }
             this.lastSwitched = now;
         }
@@ -67,5 +77,7 @@ export class Generator extends Entity {
     onCollision(target) {
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
             this.interact();
+        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == false)
+            this.genSpeed = 0;
     };
 }

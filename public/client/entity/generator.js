@@ -19,6 +19,7 @@ export default class Generator extends Entity {
             x.setMask(clientData.visionMask);
             x.setVisible(false);
         });
+        this.images[0].setVisible(true);
         this.images[3].depth = 2;
         this.images[3].alpha = 1;
         this.images[3].setScale(0.5, 0.5);
