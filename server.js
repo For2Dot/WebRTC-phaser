@@ -86,3 +86,7 @@ wss.on("connection", socket => {
             delete rooms[roomId];
     });
 });
+
+app.get("/edit", (req, res, next) => {
+    res.render("edit");
+});
