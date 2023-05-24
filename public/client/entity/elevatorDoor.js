@@ -11,17 +11,22 @@ export default class ElevatorDoor extends Entity {
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'ev-door-c'),
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'ev-door-o'),
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'gen0'),
+            new Phaser.GameObjects.Text(clientData.scene, 0, 0, `Not Allowed`, { color: '#ffffff', fontSize: '13px', backgroundColor: '#000000' }),
         ];
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
             this.gameObject.add(x);
             x.setVisible(false);
         });
+
         this.images[0].setVisible(true);
         this.images[2].setScale(0.5, 0.5);
 
+        this.images[3].depth = 2;
+        this.images[3].setScale(0.5, 0.5);
+
         this.isOpened = false;
-        this.alertIsOn = false;
+        this.alertType = 0;
     }
 
     setMeta(meta) {
@@ -32,10 +37,10 @@ export default class ElevatorDoor extends Entity {
             this.toggle();
         }
 
-        if (meta.alertIsOn && this.alertIsOn !== meta.alertIsOn) {
-            this.alertIsOn = meta.alertIsOn;
-            if (this.alertIsOn)
-                this.showAlert();
+        if (meta.alertType > 0 && this.alertType !== meta.alertType) {
+            this.alertType = meta.alertType;
+            if (this.alertType)
+                this.showAlert(this.alertType);
         }
     }
 
@@ -44,16 +49,28 @@ export default class ElevatorDoor extends Entity {
         scene.load.image('ev-door-o', '../assets/images/ev-door-o.png');
     }
 
-    showAlert() {
-        this.images[2].setVisible(true);
-        const alertEff = setInterval(() => {
-            this.images[2].setTexture(this.images[2].texture.key === 'gen0' ? 'gen50' : 'gen0');
-        }, 100);
+    showText(text) {
+    }
+
+    showAlert(alertType) {
+        let alertEff;
+
+        if (alertType == 1) {
+            this.images[2].setVisible(true);
+            alertEff = setInterval(() => {
+                this.images[2].setTexture(this.images[2].texture.key === 'gen0' ? 'gen50' : 'gen0');
+            }, 100);
+
+        } else if (alertType == 2)
+            this.images[3].setVisible(true);
 
         setTimeout(() => {
+            this.alertType = 0;
             this.alertIsOn = false;
             this.images[2].setVisible(false);
-            clearInterval(alertEff);
+            this.images[3].setVisible(false);
+
+            if (alertEff) clearInterval(alertEff);
         }, 1000);
 
     }

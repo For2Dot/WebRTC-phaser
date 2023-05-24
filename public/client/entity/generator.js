@@ -21,11 +21,11 @@ export default class Generator extends Entity {
         });
         this.images[0].setVisible(true);
         this.images[3].depth = 2;
-        this.images[3].alpha = 1;
         this.images[3].setScale(0.5, 0.5);
 
         this.progressRate = 0;
         this.lastBlinked = Date.now();
+        this.alertType = 0;
     }
 
     setMeta(meta) {
@@ -37,6 +37,21 @@ export default class Generator extends Entity {
             this.progressRate = meta.progressRate;
             this.toggleImage();
         }
+
+        if (meta.alertType > 0 && this.alertType !== meta.alertType) {
+            this.alertType = meta.alertType;
+            if (this.alertType)
+                this.showAlert(this.alertType);
+        }
+    }
+
+    showAlert(alertType) {
+        this.images[3].setText(`Not Allowed`);
+        this.images[3].setVisible(true);
+        setTimeout(() => {
+            this.images[3].setVisible(false);
+            this.alertType = 0;
+        }, 1000);
     }
 
     static prelodad(scene) {

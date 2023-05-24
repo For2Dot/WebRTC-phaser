@@ -1,13 +1,16 @@
 import { Entity } from "./entity.js";
-import { serverService } from '../server.js';
-import { constant, entityType, input } from "../../constant.js";
+import { serverService, serverData } from '../server.js';
+import { constant, entityType, input, bodyCategory, bodyLabel, playerType } from "../../constant.js";
 
 export class ElevatorDoor extends Entity {
     constructor(x, y, code) {
         super(Matter.Bodies.rectangle(x, y,
             constant.blockCenter,
             constant.blockCenter,
-            { isStatic: true },
+            {
+                isStatic: true,
+                collisionFilter: { category: bodyCategory.SENSOR_TARGET }
+            },
         ));
         this.entityType = entityType.EVDOOR;
         this.body.label = entityType.EVDOOR;
@@ -15,7 +18,7 @@ export class ElevatorDoor extends Entity {
         this.isStatic = true;
         this.isOpened = false;
         this.lastSwitched = Date.now();
-        this.alertIsOn = false;
+        this.alertType = 0;
     }
 
     toDTO() {
@@ -24,11 +27,16 @@ export class ElevatorDoor extends Entity {
             width: constant.blockCenter,
             height: constant.blockCenter,
             isOpened: this.isOpened,
-            alertIsOn: this.alertIsOn,
+            alertType: this.alertType,
         }
     }
 
     switchDoor() {
+        if (Date.now() - this.lastSwitched < 1000) return;
+        if (!serverService.rule.electricity) {
+            this.sendAlert(1); // not ready
+            return ;
+        }
         if (this.isOpened) {
             this.body.isSensor = false;
             this.isOpened = false;
@@ -37,33 +45,33 @@ export class ElevatorDoor extends Entity {
             this.body.isSensor = true;
             this.isOpened = true;
         }
+        this.lastSwitched = Date.now();
     }
 
-    interact() {
-        const now = Date.now();
-        if (now - this.lastSwitched > 1000)
-        {
+    interact(who) {
+        if (who === playerType.THIEF)
             this.switchDoor();
-            this.lastSwitched = now;
+        else if (who === playerType.POLICE)
+        {
+            this.sendAlert(2); // not allowed
         }
     }
 
-    notReady() {
-        if (this.alertIsOn == true)
+    sendAlert(alert) {
+        if (this.alertType > 0)
             return;
-        this.alertIsOn = true;
-        setTimeout(()=> {
-            this.alertIsOn = false;
+        this.alertType = alert;
+        setTimeout(() => {
+            this.alertType = 0;
         }, 1000)
     }
 
-    onCollision(target) {
-        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT])
-        {
-            if (serverService.rule.electricity == true)
-                this.interact();
-            else
-                this.notReady();
-        }
+    onCollision(myBody, targetBody) {
+        if (targetBody.label !== bodyLabel.PLAYER_SENSOR)
+            return;
+
+        const target = serverData.entityBodyMap[targetBody.id];
+        if (target.entityType === entityType.PLAYER && target.key[input.INTERACT])
+            this.interact(target.playerType);
     };
 }

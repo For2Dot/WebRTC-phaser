@@ -3,8 +3,13 @@ import { entityType } from '../constant.js';
 
 export class Rule {
     constructor() {
-        this.lastUpdate = Date.now();
+        this.startTime = Date.now();
         this.electricity = false;
+    }
+
+    gameover = () => {
+        Matter.Runner.stop(runner);
+        server.broadcast("end", null); // TOdo 클라이언트 뒤로가기
     }
 
     checkGenerator() {

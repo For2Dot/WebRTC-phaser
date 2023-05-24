@@ -12,7 +12,6 @@ export default class Wall extends Entity {
         ];
         this.images[0].fillColor = 1;
         this.images[0].setFillStyle(0x000000);
-        console.log(this.images[0]);
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
             this.gameObject.add(x);
