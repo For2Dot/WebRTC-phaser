@@ -1,12 +1,14 @@
 import { Entity } from "./entity.js";
-import { bodyCategory, bodyLabel, constant, entityType, input } from "../../constant.js";
+import { bodyCategory, bodyLabel, constant, entityType, input, playerType } from "../../constant.js";
 import { serverData, serverService } from "../server.js";
 
 export class Generator extends Entity {
     constructor(x, y, code) {
-        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, { isStatic: true, collisionFilter: {
-            category: bodyCategory.SENSOR_TARGET,
-        }}));
+        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, {
+            isStatic: true, collisionFilter: {
+                category: bodyCategory.SENSOR_TARGET,
+            }
+        }));
         this.entityType = entityType.GENERATOR;
         this.body.label = entityType.GENERATOR;
         this.wallCode = code;
@@ -16,6 +18,7 @@ export class Generator extends Entity {
         this.progressRate = 0;
         this.lastSwitched = Date.now();
         this.isWorking = false;
+        this.alertType = 0;
         this.generate();
     }
 
@@ -25,6 +28,7 @@ export class Generator extends Entity {
             width: constant.blockCenter,
             height: constant.blockCenter,
             progressRate: this.progressRate,
+            alertType: this.alertType,
         }
     }
 
@@ -56,23 +60,29 @@ export class Generator extends Entity {
         }, 200);
     }
 
-    interact() {
+    interact(who) {
         if (this.genProcess >= 1000)
             return;
+        if (who === playerType.THIEF) {
 
-        const now = Date.now();
-        if (now - this.lastSwitched > 100) {
+            if (Date.now() - this.lastSwitched > 100) {
 
-            if (this.genSpeed < 20)
-                this.genSpeed += 1;
-            this.genProcess += 100;
+                if (this.genSpeed < 20)
+                    this.genSpeed += 1;
+                this.genProcess += 100;
 
-            if (this.genProcess >= 1000) {
-                this.isWorking = true;
-                this.genProcess = 1000;
-                serverService.rule.checkGenerator();
+                if (this.genProcess >= 1000) {
+                    this.isWorking = true;
+                    this.genProcess = 1000;
+                    serverService.rule.checkGenerator();
+                }
+                this.lastSwitched = Date.now();
             }
-            this.lastSwitched = now;
+        } else if (who === playerType.POLICE) {
+            this.alertType = 1;
+            setTimeout(() => {
+                this.alertType = 0;
+            }, 1000);
         }
     }
 
@@ -83,9 +93,10 @@ export class Generator extends Entity {
     onCollision(myBody, targetBody) {
         if (targetBody.label !== bodyLabel.PLAYER_SENSOR)
             return;
+
         const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
-            this.interact();
+            this.interact(target.playerType);
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == false)
             this.genSpeed = 0;
     };

@@ -11,6 +11,8 @@ import { Rule } from "./rule.js";
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
 
+export const runner = Matter.Runner.create();
+
 export const serverData = {
     /**
      * @type {Object<string, Player>}
@@ -48,15 +50,8 @@ export const serverService = {
 export default function activity(server) {
     const noGravity = { x: 0, y: 0, scale: 0 }
     const engine = Matter.Engine.create({ gravity: noGravity });
-    const runner = Matter.Runner.create();
     const lastPing = {};
     let updateCounter = 0;
-    let startTime = null;
-
-    const gameover = () => {
-        Matter.Runner.stop(runner);
-        server.broadcast("end", null);
-    }
 
     /**
      * @param {Entity} entity 
@@ -138,7 +133,6 @@ export default function activity(server) {
             Matter.Body.setPosition(player.body, { x, y });
         });
         serverService.rule = new Rule();
-        startTime = Date.now();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
         Matter.Runner.run(runner, engine);
     }
@@ -148,7 +142,7 @@ export default function activity(server) {
     });
 
     server.addEventListener("ping", ({ connId, payload }) => {
-        lastPing[connId] = Date();
+        lastPing[connId] = Date.now();
         server.send(connId, "pong", { id: connId });
     });
 
@@ -172,7 +166,7 @@ export default function activity(server) {
                         return;
                     }
                     init();
-                    server.broadcast("start", startTime);
+                    server.broadcast("start", serverService.rule.startTime);
                     server.broadcast("chat", { id: "System", chat: "game started!" });
                     startBtn.style.display = "none";
                 }
@@ -190,9 +184,9 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
-        if (startTime + constant.gameoverTime * 1000 < Date.now()) {
-            gameover();
-        }
+        if (serverService.rule.startTime + constant.gameOverTime * 1000 < Date.now())
+            serverService.rule.gameOver();
+
         const delta = source.delta * 0.001;
         serverData.entities.forEach((entity) => entity.update(delta));
     });

@@ -42,7 +42,7 @@ export const bodyCategory = {
 }
 
 export const constant = {
-    playerCnt: 1,
+    playerCnt: 3,
     clientLerp: 0.3,
     clientZoom: 2,
     keyMap: [
@@ -62,5 +62,5 @@ export const constant = {
     sprintStamina: 50,
     fireStamina: 100,
     maximumStamina: 100,
-    gameoverTime: 300,
+    gameOverTime: 300,
 }
