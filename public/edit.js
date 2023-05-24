@@ -18,12 +18,13 @@ const render = Matter.Render.create({
 Matter.Render.run(render);
 const labels = [
     { key: "Digit1", color: "#AAA", name: "wall" },
-    { key: "Digit2", color: "#0F0", name: "door" },
-    { key: "Digit3", color: "#FF0", name: "generator" },
-    { key: "Digit4", color: "#00F", name: "elevator" },
-    { key: "Digit5", color: "#F0F", name: "police" },
-    { key: "Digit6", color: "#0FF", name: "thief" },
-    { key: "Digit7", color: "#FFF", name: "exit" },
+    { key: "Digit2", color: "#F00", name: "doorH" },
+    { key: "Digit3", color: "#0F0", name: "doorV" },
+    { key: "Digit4", color: "#FF0", name: "generator" },
+    { key: "Digit5", color: "#00F", name: "elevator" },
+    { key: "Digit6", color: "#F0F", name: "police" },
+    { key: "Digit7", color: "#0FF", name: "thief" },
+    { key: "Digit8", color: "#FFF", name: "exit" },
 ]
 let blocks = [];
 let stack = [];
