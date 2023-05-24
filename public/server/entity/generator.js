@@ -1,6 +1,6 @@
 import { Entity } from "./entity.js";
 import { bodyCategory, bodyLabel, constant, entityType, input } from "../../constant.js";
-import { serverData } from "../server.js";
+import { serverData, serverService } from "../server.js";
 
 export class Generator extends Entity {
     constructor(x, y, code) {
