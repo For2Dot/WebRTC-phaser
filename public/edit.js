@@ -1,7 +1,7 @@
 window.onbeforeunload = () => "edit";
 const blockSize = 16;
-const canvasWidth = 16 * 50;
-const canvasHeight = 16 * 30;
+const canvasWidth = blockSize * 50;
+const canvasHeight = blockSize * 30;
 const noGravity = { x: 0, y: 0, scale: 0 }
 const engine = Matter.Engine.create({ gravity: noGravity });
 const runner = Matter.Runner.create();
@@ -45,7 +45,7 @@ const addBlock = (x1, y1, x2, y2, label) => {
     return body;
 };
 const removeBlock = (body) => {
-    if (body == null)
+    if (body == null || blocks.find(x => x == body) == null)
         return;
     Matter.Composite.remove(engine.world, body);
     blocks = blocks.filter(x => x != body);
@@ -85,11 +85,18 @@ Matter.Events.on(mouseConstraint, "mouseup", ({mouse}) => {
     const y1 = Math.floor(Math.min(mouse.mousedownPosition.y, calcPos.y) / blockSize);
     const x2 = Math.floor(Math.max(mouse.mousedownPosition.x, calcPos.x) / blockSize);
     const y2 = Math.floor(Math.max(mouse.mousedownPosition.y, calcPos.y) / blockSize);
-    console.log(x1,y1,x2,y2);
-    selectedBody = addBlock(x1, y1, x2, y2, blockLabel);
-    stack = [];
+    if (blockLabel != null) {
+        console.log(x1,y1,x2,y2);
+        selectedBody = addBlock(x1, y1, x2, y2, blockLabel);
+        stack = [];
+    }
     startPos = null;
     nowPos = null;
+});
+
+Matter.Events.on(runner, "tick", event => {
+    if (mouseConstraint.body && blockLabel == null)
+        removeBlock(mouseConstraint.body);
 });
 
 Matter.World.add(engine.world, mouseConstraint);
@@ -131,6 +138,8 @@ document.addEventListener('keydown', function(event) {
         removeBlock(blocks[blocks.length - 1]);
     if (event.code === "KeyS")
         exportToJson();
+    if (event.code === "KeyX")
+        blockLabel = null;
     const label = labels.find(x => x.key === event.code);
     if (label != null)
         blockLabel = label.name;

@@ -9,6 +9,7 @@ export default class Bullet extends Entity {
         this.images = [
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, "bullet"),
         ];
+        this.images[0].scale = 0.15;
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
             this.gameObject.add(x);

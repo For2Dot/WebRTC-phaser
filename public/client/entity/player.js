@@ -10,7 +10,9 @@ export default class Player extends Entity {
 		this.stamina = this.meta.stamina;
 		this.images = [
 			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "female", "townsfolk_f_idle_1"),
+			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "jail"),
 		];
+		this.images[1].setVisible(false);
 		if (meta.connId === clientData.connId)
 			this.images.push(new Phaser.GameObjects.Image(clientData.scene, 0, 0, "my_bar"));
 		this.images.forEach(x => {
@@ -22,13 +24,14 @@ export default class Player extends Entity {
 		this.lastFire = Date.now();
 		if (this.meta.connId == clientData.connId)
 		{
-			this.images[1].depth = 1;
-			this.images[1].scaleY = 0.5;
+			this.images[2].depth = 1;
+			this.images[2].scaleY = 0.5;
 		}
 	}
 
 	static prelodad(scene) {
 		scene.load.atlas('female', '../assets/images/female.png', '../assets/images/female_atlas.json');
+		scene.load.image("jail", '../assets/images/jail.png');
 		scene.load.image("footprint", '../assets/images/footprint.png');
 		scene.load.image("circle", '../assets/images/circle.png');
 		scene.load.image("my_bar", '../assets/images/bar.png');
@@ -78,9 +81,18 @@ export default class Player extends Entity {
 	{
 		if (this.meta.connId !== clientData.connId)
 			return;
-		this.images[1].x = this.x;
-		this.images[1].y = this.y + 16;
-		this.images[1].scaleX = this.meta.stamina / constant.maximumStamina;
+		this.images[2].x = this.x;
+		this.images[2].y = this.y + 16;
+		this.images[2].scaleX = this.meta.stamina / constant.maximumStamina;
+	}
+
+	updateJail()
+	{
+		if (this.meta.isPrision)
+			this.images[1].setVisible(true);
+		else
+			this.images[1].setVisible(false);
+		this.images[1].y = this.y + 8;
 	}
 
 	update() {
@@ -88,5 +100,6 @@ export default class Player extends Entity {
 		this.updateFootprint();
 		this.updateFireBulletFx();
 		this.updateMybar();
+		this.updateJail();
 	}
 }
