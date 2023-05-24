@@ -30,7 +30,7 @@ export const serverData = {
     /**
      * @type {Object<number, Entity>}
      */
-    entityMap: {},
+    entityBodyMap: {},
 };
 
 export const serverService = {
@@ -65,7 +65,9 @@ export default function activity(server) {
         if (entity.body == null || entity.body.id == null)
             return;
         serverData.entities.push(entity);
-        serverData.entityMap[entity.body.id] = entity;
+        entity.body.parts.forEach(x => {
+            serverData.entityBodyMap[x.id] = entity;
+        });
         if (entity.entityType == entityType.PLAYER) {
             serverData.players.push(entity);
             serverData.playerMapByConnId[entity.connId] = entity;
@@ -78,10 +80,12 @@ export default function activity(server) {
      * @param {Entity} entity 
      */
     serverService.removeEntity = (entity) => {
-        if (serverData.entityMap[entity.body.id] == null)
+        if (serverData.entityBodyMap[entity.body.id] == null)
             return;
         serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
-        delete serverData.entityMap[entity.body.id];
+        entity.body.parts.forEach(x => {
+            delete serverData.entityBodyMap[x.id];
+        });
         if (entity.entityType === entityType.PLAYER) {
             serverData.players = serverData.players.filter(x => x.body.id !== entity?.body?.id);
             delete serverData.playerMapByConnId[entity.connId];
@@ -190,10 +194,10 @@ export default function activity(server) {
 
     Matter.Events.on(engine, "collisionStart", (event) => {
         event.pairs.forEach(x => {
-            if (serverData.entityMap[x.bodyA.id] != null && serverData.entityMap[x.bodyA.id].onCollision != null)
-                serverData.entityMap[x.bodyA.id].onCollision(serverData.entityMap[x.bodyB.id]);
-            if (serverData.entityMap[x.bodyB.id] != null && serverData.entityMap[x.bodyB.id].onCollision != null)
-                serverData.entityMap[x.bodyB.id].onCollision(serverData.entityMap[x.bodyA.id]);
+            if (serverData.entityBodyMap[x.bodyA.id] != null && (x.bodyA.collisionFilter.mask & x.bodyB.collisionFilter.category) > 0)
+                serverData.entityBodyMap[x.bodyA.id].onCollision(x.bodyA, x.bodyB);
+            if (serverData.entityBodyMap[x.bodyB.id] != null && (x.bodyB.collisionFilter.mask & x.bodyA.collisionFilter.category) > 0)
+                serverData.entityBodyMap[x.bodyB.id].onCollision(x.bodyB, x.bodyA);
         });
     });
 

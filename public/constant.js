@@ -29,6 +29,17 @@ export const gameResultType = {
     LOSE: "lose",
 }
 
+export const bodyLabel = {
+    PLAYER: "player",
+    PLAYER_SENSOR: "player_sensor",
+}
+
+export const bodyCategory = {
+    BODY: 1,
+    SENSOR: 2,
+    SENSOR_TARGET: 4,
+}
+
 export const constant = {
     playerCnt: 1,
     clientLerp: 0.3,
