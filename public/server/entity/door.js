@@ -30,12 +30,23 @@ export class Door extends Entity {
     }
 
     switchDoor() {
+        let timer;
         if (this.isOpened) {
             this.body.isSensor = false;
             this.isOpened = false;
+            if (timer)
+                clearTimeout(timer);
         } else {
             this.body.isSensor = true;
             this.isOpened = true;
+
+            timer = setTimeout(() => {
+                if (Date.now() - this.lastSwitched > 5000)
+                {
+                    this.body.isSensor = false;
+                    this.isOpened = false;
+                }
+            }, 5000);
         }
     }
 
