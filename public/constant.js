@@ -63,4 +63,5 @@ export const constant = {
     fireStamina: 100,
     maximumStamina: 100,
     gameOverTime: 300,
+    generatorCnt: 8,
 }

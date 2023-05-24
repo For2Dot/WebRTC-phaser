@@ -90,29 +90,37 @@ export default function activity(server) {
 
     const init = () => {
 
-        tiles.map(r => {
-            const x = (r.rect[1].x + r.rect[0].x) * 0.5 * constant.blockCenter;
-            const y = (r.rect[1].y + r.rect[0].y) * 0.5 * constant.blockCenter;
-            const width = (r.rect[1].x - r.rect[0].x) * constant.blockCenter;
-            const height = (r.rect[1].y - r.rect[0].y) * constant.blockCenter;
-            const label = r.label;
-            if (label === "wall")
-                serverService.addEntity(new Wall(x, y, width, height));
-            if (label === "door")
-                serverService.addEntity(new Door(x, y, width, height));
-            if (label === "generator")
-                serverService.addEntity(new Generator(x, y, width, height));
-            if (label === "elevator")
-                serverService.addEntity(new ElevatorDoor(x, y, width, height));
-        });
-
-        serverData.players.forEach((player, idx) => {
-
-            const x = idx * 25 + 100;
-            const y = 100;
-
-            Matter.Body.setPosition(player.body, { x, y });
-        });
+        const refinedMap = tiles.map(r => ({
+            x: (r.rect[1].x + r.rect[0].x) * 0.5 * constant.blockCenter,
+            y: (r.rect[1].y + r.rect[0].y) * 0.5 * constant.blockCenter,
+            width: (r.rect[1].x - r.rect[0].x) * constant.blockCenter,
+            height: (r.rect[1].y - r.rect[0].y) * constant.blockCenter,
+            label: r.label,
+        }));
+        refinedMap.filter(x => x.label === "wall")
+            .forEach(x => serverService.addEntity(new Wall(x.x, x.y, x.width, x.height)));
+        refinedMap.filter(x => x.label === "door")
+            .forEach(x => serverService.addEntity(new Door(x.x, x.y, x.width, x.height)));
+        refinedMap.filter(x => x.label === "elevator")
+            .forEach(x => serverService.addEntity(new ElevatorDoor(x.x, x.y, x.width, x.height)));
+        randomPick(refinedMap.filter(x => x.label === "generator"), constant.generatorCnt)
+            .forEach(x => serverService.addEntity(new Generator(x.x, x.y, x.width, x.height)));
+        const thiefPositions = randomPick(refinedMap.filter(x => x.label === "thief"), constant.playerCnt - 1);
+        const policePositions = randomPick(refinedMap.filter(x => x.label === "police"), 1);
+        for (const idx in serverData.players) {
+            const player = serverData.players[idx];
+            if (idx == 0) {
+                Matter.Body.setPosition(player.body, {
+                    x: policePositions[idx].x,
+                    y: policePositions[idx].y,
+                });
+            } else {
+                Matter.Body.setPosition(player.body, {
+                    x: thiefPositions[idx - 1].x,
+                    y: thiefPositions[idx - 1].y,
+                });
+            }
+        }
         serverService.rule = new Rule();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
         Matter.Runner.run(runner, engine);
@@ -193,4 +201,15 @@ export default function activity(server) {
         });
     });
 
+}
+
+/**
+ * @param {[]} arr 
+ * @param {number} cnt 
+ */
+function randomPick(arr, cnt) {
+    if (arr.length <= cnt)
+        return arr.slice(0);
+    arr.sort(() => Math.random() - 0.5);
+    return arr.slice(0, cnt);
 }
