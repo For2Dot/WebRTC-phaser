@@ -33,10 +33,11 @@ export class Player extends Entity {
         this.dx = 1;
         this.dy = 0;
         this.stamina = constant.maximumStamina;
-        this.speed = isPolice ? 80 : 50;
+        this.speed = isPolice ? 60 : 50;
         this.playerType = isPolice ? playerType.POLICE : playerType.THIEF;
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
+        this.lastFireTime = Date.now();
         this.isImprisoned = false;
         this.isEscaped = false;
         this.isSensor = false;
@@ -56,12 +57,18 @@ export class Player extends Entity {
         const isDown = this.key[input.DOWN];
         const isUp = this.key[input.UP];
 
-        if (this.lastSprintTime + 1000 < Date.now() && this.stamina < constant.maximumStamina)
-            this.stamina += constant.recoveryStaminaPerFrame * delta;
+        if (this.playerType === playerType.THIEF){
+            if (this.lastSprintTime + 4000 < Date.now() && this.stamina < constant.maximumStamina)
+                this.stamina += constant.recoveryStaminaPerFrame * delta;
+        }
+        else{
+            if (this.lastFireTime + 2000 < Date.now() && this.stamina < constant.maximumStamina)
+                this.stamina += constant.recoveryStaminaPerFrame * delta;
+        }
         if (this.slowTime !== 0)
-        this.damagedByBullet();
+            this.damagedByBullet();
         if (this.slowTime > 400)
-        this.recovred();
+            this.recovred();
         
         this.isFire = this.key[input.FIRE] ? this.fire(delta) : this.notFire(delta);
         this.isSprint = this.key[input.SPRINT] ? this.sprint(delta) : this.notSprint(delta);
@@ -86,10 +93,9 @@ export class Player extends Entity {
             return (false);
         this.stamina -= constant.fireStamina;
         const { x: bx, y: by } = this.body.position;
-        const x = bx + (Math.cos(this.body.angle) * 10);
-        const y = by + (Math.sin(this.body.angle) * 10);
 
-        serverService.addEntity(new Bullet(x, y, this.dx, this.dy));
+        serverService.addEntity(new Bullet(bx, by, this.dx, this.dy));
+        this.lastFireTime = Date.now();
         return (true);
     }
 
