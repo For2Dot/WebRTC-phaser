@@ -16,6 +16,6 @@ export default class Bullet extends Entity {
     }
 
     static prelodad(scene) {
-        scene.load.image('bullet', '../assets/images/ship2.png');
+        scene.load.image('bullet', '../assets/images/bullet.png');
     }
 }

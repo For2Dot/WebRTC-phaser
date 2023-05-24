@@ -1,12 +1,27 @@
 import { Entity } from "./entity.js";
-import { input, entityType, playerType, constant } from "../../constant.js";
+import { input, entityType, playerType, constant, bodyLabel, bodyCategory } from "../../constant.js";
 import { Bullet } from "./bullet.js";
-import { serverService } from "../server.js";
+import { serverData, serverService } from "../server.js";
 
 export class Player extends Entity {
     constructor(connId, x = 0, y = 0, isPolice = 0) {
-        super(Matter.Bodies.circle(x, y, 8));
-
+        const group = Entity.getNextGroupId();
+        const playerBody = Matter.Bodies.circle(x, y, 8, { label: bodyLabel.PLAYER, collisionFilter: {
+            mask: bodyCategory.BODY,
+            group,
+        }});
+        const sensorBody =  Matter.Bodies.circle(x, y, 12, { isSensor: true, label: bodyLabel.PLAYER_SENSOR, collisionFilter: {
+            category: bodyCategory.SENSOR,
+            mask: bodyCategory.SENSOR_TARGET,
+            group,
+        }});
+        const parts = [playerBody, sensorBody];
+        super(Matter.Body.create({
+            parts,
+            collisionFilter: {
+                group,
+            },
+        }));
         this.entityType = entityType.PLAYER;
         this.connId = connId;
         this.key = {};
@@ -107,7 +122,14 @@ export class Player extends Entity {
         this.speed = 50;
     }
 
-    onCollision(target){
+    /**
+     * @param {Matter.Body} myBody 
+     * @param {Matter.Body} targetBody 
+     */
+    onCollision(myBody, targetBody){
+        if (myBody.label !== bodyLabel.PLAYER)
+            return;
+        const target = serverData.entityBodyMap[targetBody.id];
         if (this.playerType === playerType.THIEF && target.entityType === entityType.BULLET)
             this.slowTime = 1;
         else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){

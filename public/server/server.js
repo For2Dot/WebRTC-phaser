@@ -1,10 +1,12 @@
 import { Server } from "./webrtc.js";
-import { constant, entityType, playerType, input } from "../constant.js";
+import { constant, entityType } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
 import { Wall } from "./entity/wall.js";
 import { Door } from "./entity/door.js";
 import { Generator } from "./entity/generator.js";
+import { ElevatorDoor } from "./entity/elevatordoor.js";
+import { Rule } from "./rule.js";
 
 const tiles = await fetch("/assets/images/testmap.json")
     .then(x => x.json());
@@ -28,12 +30,16 @@ export const serverData = {
     /**
      * @type {Object<number, Entity>}
      */
-    entityMap: {},
+    entityBodyMap: {},
 };
 
 export const serverService = {
     addEntity: null,
     removeEntity: null,
+    /**
+     * @type {Rule}
+     */
+    rule: null,
 }
 
 /**
@@ -59,7 +65,9 @@ export default function activity(server) {
         if (entity.body == null || entity.body.id == null)
             return;
         serverData.entities.push(entity);
-        serverData.entityMap[entity.body.id] = entity;
+        entity.body.parts.forEach(x => {
+            serverData.entityBodyMap[x.id] = entity;
+        });
         if (entity.entityType == entityType.PLAYER) {
             serverData.players.push(entity);
             serverData.playerMapByConnId[entity.connId] = entity;
@@ -68,15 +76,16 @@ export default function activity(server) {
             Matter.Composite.add(engine.world, entity.body);
     }
 
-
     /**
      * @param {Entity} entity 
      */
     serverService.removeEntity = (entity) => {
-        if (serverData.entityMap[entity.body.id] == null)
+        if (serverData.entityBodyMap[entity.body.id] == null)
             return;
         serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
-        delete serverData.entityMap[entity.body.id];
+        entity.body.parts.forEach(x => {
+            delete serverData.entityBodyMap[x.id];
+        });
         if (entity.entityType === entityType.PLAYER) {
             serverData.players = serverData.players.filter(x => x.body.id !== entity?.body?.id);
             delete serverData.playerMapByConnId[entity.connId];
@@ -117,7 +126,6 @@ export default function activity(server) {
             }
         }
 
-
         serverData.players.forEach((player, idx) => {
 
             const x = idx * 25 + 100;
@@ -125,6 +133,7 @@ export default function activity(server) {
 
             Matter.Body.setPosition(player.body, { x, y });
         });
+        serverService.rule = new Rule();
         startTime = Date.now();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
         Matter.Runner.run(runner, engine);
@@ -133,7 +142,6 @@ export default function activity(server) {
     server.addEventListener("chat", ({ connId, payload }) => {
         server.broadcast("chat", { id: connId, chat: payload });
     });
-
 
     server.addEventListener("ping", ({ connId, payload }) => {
         lastPing[connId] = Date();
@@ -199,10 +207,10 @@ export default function activity(server) {
 
     Matter.Events.on(engine, "collisionStart", (event) => {
         event.pairs.forEach(x => {
-            if (serverData.entityMap[x.bodyA.id] != null && serverData.entityMap[x.bodyA.id].onCollision != null)
-                serverData.entityMap[x.bodyA.id].onCollision(serverData.entityMap[x.bodyB.id]);
-            if (serverData.entityMap[x.bodyB.id] != null && serverData.entityMap[x.bodyB.id].onCollision != null)
-                serverData.entityMap[x.bodyB.id].onCollision(serverData.entityMap[x.bodyA.id]);
+            if (serverData.entityBodyMap[x.bodyA.id] != null && (x.bodyA.collisionFilter.mask & x.bodyB.collisionFilter.category) > 0)
+                serverData.entityBodyMap[x.bodyA.id].onCollision(x.bodyA, x.bodyB);
+            if (serverData.entityBodyMap[x.bodyB.id] != null && (x.bodyB.collisionFilter.mask & x.bodyA.collisionFilter.category) > 0)
+                serverData.entityBodyMap[x.bodyB.id].onCollision(x.bodyB, x.bodyA);
         });
     });
 

@@ -1,9 +1,12 @@
 import { Entity } from "./entity.js";
-import { constant, entityType, input } from "../../constant.js";
+import { bodyCategory, bodyLabel, constant, entityType, input } from "../../constant.js";
+import { serverData, serverService } from "../server.js";
 
 export class Generator extends Entity {
     constructor(x, y, code) {
-        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, { isStatic: true }));
+        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, { isStatic: true, collisionFilter: {
+            category: bodyCategory.SENSOR_TARGET,
+        }}));
         this.entityType = entityType.GENERATOR;
         this.body.label = entityType.GENERATOR;
         this.wallCode = code;
@@ -23,6 +26,14 @@ export class Generator extends Entity {
             height: constant.blockCenter,
             progressRate: this.progressRate,
         }
+    }
+
+    reset() {
+        this.genProcess = 0;
+        this.genSpeed = 0;
+        this.progressRate = 0;
+        this.lastSwitched = Date.now();
+        this.isWorking = false;
     }
 
     generate() {
@@ -54,18 +65,28 @@ export class Generator extends Entity {
 
             if (this.genSpeed < 20)
                 this.genSpeed += 1;
-            this.genProcess += 1;
+            this.genProcess += 100;
 
             if (this.genProcess >= 1000) {
                 this.isWorking = true;
                 this.genProcess = 1000;
+                serverService.rule.checkGenerator();
             }
             this.lastSwitched = now;
         }
     }
 
-    onCollision(target) {
+    /**
+     * @param {Matter.Body} myBody 
+     * @param {Matter.Body} targetBody 
+     */
+    onCollision(myBody, targetBody) {
+        if (targetBody.label !== bodyLabel.PLAYER_SENSOR)
+            return;
+        const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
             this.interact();
+        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == false)
+            this.genSpeed = 0;
     };
 }

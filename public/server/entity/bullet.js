@@ -1,6 +1,6 @@
 import { Entity } from "./entity.js";
-import { entityType, playerType } from "../../constant.js";
-import { serverService } from "../server.js";
+import { bodyLabel, entityType, playerType } from "../../constant.js";
+import { serverData, serverService } from "../server.js";
 
 export class Bullet extends Entity {
     constructor(x = 0, y = 0, dx, dy) {
@@ -22,7 +22,14 @@ export class Bullet extends Entity {
         }, 1000);
     }
 
-    onCollision(target){
+    /**
+     * @param {Matter.Body} myBody 
+     * @param {Matter.Body} targetBody 
+     */
+    onCollision(myBody, targetBody){
+        if (targetBody.label !== bodyLabel.PLAYER)
+            return;
+        const target = serverData.entityBodyMap[targetBody.id];
         if (target.playerType !== playerType.POLICE)
             serverService.removeEntity(this);
     }

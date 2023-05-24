@@ -19,6 +19,7 @@ export const entityType = {
     TESTBALL: "testBall",
     WALL: "wall",
     DOOR: "door",
+    EVDOOR: "elevatorDoor",
     GENERATOR: "generator",
     BULLET: "bullet",
 }
@@ -26,6 +27,17 @@ export const entityType = {
 export const gameResultType = {
     WIN: "win",
     LOSE: "lose",
+}
+
+export const bodyLabel = {
+    PLAYER: "player",
+    PLAYER_SENSOR: "player_sensor",
+}
+
+export const bodyCategory = {
+    BODY: 1,
+    SENSOR: 2,
+    SENSOR_TARGET: 4,
 }
 
 export const constant = {

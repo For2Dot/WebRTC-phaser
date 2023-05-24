@@ -7,6 +7,7 @@ import Wall from "./entity/wall.js";
 import Door from "./entity/door.js";
 import Generator from "./entity/generator.js";
 import Bullet from "./entity/bullet.js";
+import ElevatorDoor from "./entity/elevatorDoor.js";
 
 export const clientData = {
     players: [],
@@ -61,6 +62,8 @@ export const createEntity = (meta) => {
         entity = new Wall(meta);
     else if (meta.type == entityType.DOOR)
         entity = new Door(meta);
+    else if (meta.type == entityType.EVDOOR)
+        entity = new ElevatorDoor(meta);
     else if (meta.type == entityType.GENERATOR)
         entity = new Generator(meta);
     else if (meta.type == entityType.BULLET)
