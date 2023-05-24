@@ -12,7 +12,7 @@ export class Bullet extends Entity {
         ));
 		this.body.isSensor = true;
 		this.entityType = entityType.BULLET;
-		this.body.label = entityType.BULLET;
+		this.body.label = bodyLabel.BULLET;
         Matter.Body.applyForce(this.body, this.body.position, {
             x: dx * 0.09,
             y: dy * 0.09,
@@ -28,7 +28,13 @@ export class Bullet extends Entity {
      */
     onCollision(myBody, targetBody){
         const target = serverData.entityBodyMap[targetBody.id];
-        if (target.playerType !== playerType.POLICE)
+        if (target.entityType !== entityType.PLAYER)
             serverService.removeEntity(this);
+        else{
+            if (target.isSensor === true) ;
+            else if (target.playerType === playerType.THIEF &&
+                target.body.parts.find(x => x.label === bodyLabel.PLAYER) != null)
+                serverService.removeEntity(this);
+        }
     }
 }

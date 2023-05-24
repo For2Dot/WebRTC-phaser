@@ -32,6 +32,7 @@ export const gameResultType = {
 export const bodyLabel = {
     PLAYER: "player",
     PLAYER_SENSOR: "player_sensor",
+    BULLET: "bullet",
 }
 
 export const bodyCategory = {

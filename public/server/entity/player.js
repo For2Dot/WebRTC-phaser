@@ -38,6 +38,7 @@ export class Player extends Entity {
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
         this.isPrision = false;
+        this.isSensor = false;
     }
 
     update(delta) {
@@ -131,17 +132,19 @@ export class Player extends Entity {
             return;
         const target = serverData.entityBodyMap[targetBody.id];
         const me = serverData.entityBodyMap[myBody.id];
-        if (this.playerType === playerType.THIEF && target.entityType === entityType.BULLET)
+        if (this.playerType === playerType.THIEF && targetBody.label === bodyLabel.BULLET)
             this.slowTime = 1;
         else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){
             if (this.isPrision) return ;
             this.isPrision = true;
             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
+            this.isSensor = true;
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
             if (!this.isPrision) return ;
             this.isPrision = false;
             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = false;
+            this.isSensor = false;
         }
     }
 
