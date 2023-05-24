@@ -27,8 +27,6 @@ export class Bullet extends Entity {
      * @param {Matter.Body} targetBody 
      */
     onCollision(myBody, targetBody){
-        if (targetBody.label !== bodyLabel.PLAYER)
-            return;
         const target = serverData.entityBodyMap[targetBody.id];
         if (target.playerType !== playerType.POLICE)
             serverService.removeEntity(this);
