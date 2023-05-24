@@ -10,6 +10,10 @@ const config = {
 	parent: 'simple-game',
 	scene: [BootScene],
 	pixelArt: true,
+	fps: {
+		target: 30,
+		forceSetTimeOut: true,
+	}
 }
 const game = new Phaser.Game(config);
 const findScene = setInterval(() => {

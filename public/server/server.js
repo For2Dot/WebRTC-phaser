@@ -181,15 +181,15 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        if (updateCounter === 0) {
+        if (updateCounter++ === 0) {
             server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
-            ++updateCounter;
+            return;
         }
-        else {
-            server.broadcast("frame", serverData.entities
-                .filter(x => x.entityType !== entityType.WALL)
-                .map(x => x.toDTO()));
-        }
+        if (updateCounter % 2 !== 0)
+            return;
+        server.broadcast("frame", serverData.entities
+            .filter(x => x.entityType !== entityType.WALL)
+            .map(x => x.toDTO()));
     });
 
     Matter.Events.on(engine, "collisionStart", (event) => {
