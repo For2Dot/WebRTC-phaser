@@ -123,6 +123,10 @@ export default function activity(server) {
                     serverService.addEntity(new Generator(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
                                                         constant.blockCenter + (y * constant.blockCenter), 
                                                         tileId));
+               else if (tileId === 104)
+                    serverService.addEntity(new ElevatorDoor(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
+                                                        constant.blockCenter + (y * constant.blockCenter),
+                                                        tileId)); 
             }
         }
 

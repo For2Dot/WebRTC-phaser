@@ -130,17 +130,18 @@ export class Player extends Entity {
         if (myBody.label !== bodyLabel.PLAYER)
             return;
         const target = serverData.entityBodyMap[targetBody.id];
+        const me = serverData.entityBodyMap[myBody.id];
         if (this.playerType === playerType.THIEF && target.entityType === entityType.BULLET)
             this.slowTime = 1;
         else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){
             if (this.isPrision) return ;
             this.isPrision = true;
-            this.body.isSensor = true;
+            me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
             if (!this.isPrision) return ;
             this.isPrision = false;
-            this.body.isSensor = false;
+            me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = false;
         }
     }
 
