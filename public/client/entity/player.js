@@ -31,7 +31,6 @@ export default class Player extends Entity {
 		scene.load.atlas('female', '../assets/images/female.png', '../assets/images/female_atlas.json');
 		scene.load.image("footprint", '../assets/images/footprint.png');
 		scene.load.image("circle", '../assets/images/circle.png');
-		scene.load.image("bullet", '../assets/images/ship.png');
 		scene.load.image("my_bar", '../assets/images/bar.png');
 	}
 

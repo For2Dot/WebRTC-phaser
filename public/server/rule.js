@@ -1,17 +1,26 @@
-import {serverData} from './server.js';
+import { serverData, serverService } from './server.js';
+import { entityType } from '../constant.js';
 
-class Rule {
+export class Rule {
     constructor() {
         this.lastUpdate = Date.now();
+        this.electricity = false;
     }
 
     checkGenerator() {
         const generatorsToSwitch = serverData.entities
-            .filter(x => x.entityType === entityType.GENERATOR)
+            .filter(x => x.body.label === entityType.GENERATOR)
             .filter(x => x.isWorking === false)
             .length;
         if (generatorsToSwitch > 0)
-            return ;
-        serverData['electricity'] = true;
+            return;
+        serverService.rule['electricity'] = true;
+        console.log('Electricity is on');
+        
+    }
+
+    resetGenerators = () => {
+        serverService.rule['electricity'] = false;
+        serverData.entities.filter(x => x.entityType === entityType.GENERATOR).forEach(x => x.reset());
     }
 }

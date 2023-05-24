@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { serverData } from '../server.js';
+import { serverService } from '../server.js';
 import { constant, entityType, input } from "../../constant.js";
 
 export class ElevatorDoor extends Entity {
@@ -32,6 +32,7 @@ export class ElevatorDoor extends Entity {
         if (this.isOpened) {
             this.body.isSensor = false;
             this.isOpened = false;
+            serverService.rule.resetGenerators();
         } else {
             this.body.isSensor = true;
             this.isOpened = true;
@@ -40,7 +41,7 @@ export class ElevatorDoor extends Entity {
 
     interact() {
         const now = Date.now();
-        if (now - this.lastSwitched > 500)
+        if (now - this.lastSwitched > 1000)
         {
             this.switchDoor();
             this.lastSwitched = now;
@@ -59,7 +60,7 @@ export class ElevatorDoor extends Entity {
     onCollision(target) {
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT])
         {
-            if (serverData.electricity)
+            if (serverService.rule.electricity == true)
                 this.interact();
             else
                 this.notReady();

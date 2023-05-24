@@ -36,6 +36,10 @@ export const serverData = {
 export const serverService = {
     addEntity: null,
     removeEntity: null,
+    /**
+     * @type {Rule}
+     */
+    rule: null,
 }
 
 /**
@@ -69,6 +73,8 @@ export default function activity(server) {
         if (entity.appendToEngine)
             Matter.Composite.add(engine.world, entity.body);
     }
+
+
 
 
     /**
@@ -114,7 +120,7 @@ export default function activity(server) {
 
             Matter.Body.setPosition(player.body, { x, y });
         });
-        serverData['rule'] = new Rule();
+        serverService.rule = new Rule();
         startTime = Date.now();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
         Matter.Runner.run(runner, engine);

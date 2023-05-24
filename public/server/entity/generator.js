@@ -1,6 +1,6 @@
 import { Entity } from "./entity.js";
 import { constant, entityType, input } from "../../constant.js";
-import { serverData } from "../server.js";
+import { serverService } from "../server.js";
 
 export class Generator extends Entity {
     constructor(x, y, code) {
@@ -24,6 +24,14 @@ export class Generator extends Entity {
             height: constant.blockCenter,
             progressRate: this.progressRate,
         }
+    }
+
+    reset() {
+        this.genProcess = 0;
+        this.genSpeed = 0;
+        this.progressRate = 0;
+        this.lastSwitched = Date.now();
+        this.isWorking = false;
     }
 
     generate() {
@@ -60,7 +68,7 @@ export class Generator extends Entity {
             if (this.genProcess >= 1000) {
                 this.isWorking = true;
                 this.genProcess = 1000;
-                serverData['rule'].checkGenerator();
+                serverService.rule.checkGenerator();
             }
             this.lastSwitched = now;
         }
