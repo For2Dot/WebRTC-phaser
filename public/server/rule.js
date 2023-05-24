@@ -9,7 +9,7 @@ export class Rule {
 
     checkGenerator() {
         const generatorsToSwitch = serverData.entities
-            .filter(x => x.body.label === entityType.GENERATOR)
+            .filter(x => x.entityType === entityType.GENERATOR)
             .filter(x => x.isWorking === false)
             .length;
         if (generatorsToSwitch > 0)

@@ -74,9 +74,6 @@ export default function activity(server) {
             Matter.Composite.add(engine.world, entity.body);
     }
 
-
-
-
     /**
      * @param {Entity} entity 
      */
@@ -112,7 +109,6 @@ export default function activity(server) {
             }
         }
 
-
         serverData.players.forEach((player, idx) => {
 
             const x = idx * 25 + 100;
@@ -129,7 +125,6 @@ export default function activity(server) {
     server.addEventListener("chat", ({ connId, payload }) => {
         server.broadcast("chat", { id: connId, chat: payload });
     });
-
 
     server.addEventListener("ping", ({ connId, payload }) => {
         lastPing[connId] = Date();
