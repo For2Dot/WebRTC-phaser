@@ -2,19 +2,23 @@ import { Entity } from "./entity.js";
 import { constant, entityType } from "../../constant.js";
 
 export class Wall extends Entity {
-    constructor(x, y, code) {
-        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, { isStatic: true }));
+    constructor(x = 0, y = 0, w = 0, h = 0, tileID = 0) {
+        super(Matter.Bodies.rectangle(x, y, w, h, { isStatic: true }));
+        this.w = w;
+        this.h = h;
+        this.code = tileID;
         this.entityType = entityType.WALL;
         this.body.label = entityType.WALL;
-        this.wallCode = code;
         this.isStatic = true;
     }
-
+    
     toDTO() {
         return {
             ...super.toDTO(),
-            width: constant.blockCenter,
-            height: constant.blockCenter,
+            width: this.w,
+            height: this.h,
+            code: this.code,
         }
     }
 }
+
