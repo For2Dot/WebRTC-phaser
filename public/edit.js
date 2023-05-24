@@ -23,6 +23,7 @@ const labels = [
     { key: "Digit4", color: "#00F", name: "elevator" },
     { key: "Digit5", color: "#F0F", name: "police" },
     { key: "Digit6", color: "#0FF", name: "thief" },
+    { key: "Digit7", color: "#FFF", name: "exit" },
 ]
 let blocks = [];
 let stack = [];
