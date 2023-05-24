@@ -101,15 +101,28 @@ export default function activity(server) {
         for (let y = 0; y < height; ++y) {
             for (let x = 0; x < width; ++x) {
                 const tileId = targetLayer.data[x + y * width];
-
-                if (tileId === 1)
-                    serverService.addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
-                else if (tileId === 2)
-                    serverService.addEntity(new Door(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
-                else if (tileId === 3)
-                    serverService.addEntity(new Generator(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
-                else if (tileId === 4)
-                    serverService.addEntity(new ElevatorDoor(constant.blockCenter + (x * constant.blockCenter), constant.blockCenter + (y * constant.blockCenter), tileId));
+                if (tileId < 100 && tileId > 0){
+                    serverService.addEntity(new Wall((constant.blockCenter * x) + (constant.blockCenter * tileId) - (tileId * constant.blockCenter / 2),
+                                                    constant.blockCenter + (y * constant.blockCenter),
+                                                    constant.blockCenter * tileId, 
+                                                    constant.blockCenter,
+                                                    tileId));
+                }
+                else if (tileId < 0){
+                    serverService.addEntity(new Wall(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
+                                                    (constant.blockCenter * y) + (constant.blockCenter * (-1 * tileId)) - ((-1 * tileId -1) * (constant.blockCenter / 2)),
+                                                    constant.blockCenter,
+                                                    constant.blockCenter * (-1 * tileId), 
+                                                    tileId));
+                }
+                else if (tileId === 102)
+                    serverService.addEntity(new Door(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
+                                                        constant.blockCenter + (y * constant.blockCenter),
+                                                        tileId));
+                else if (tileId === 103)
+                    serverService.addEntity(new Generator(constant.blockCenter + (x * constant.blockCenter) - (constant.blockCenter / 2),
+                                                        constant.blockCenter + (y * constant.blockCenter), 
+                                                        tileId));
             }
         }
 

@@ -80,6 +80,7 @@ export default class BootScene extends Phaser.Scene {
 				polygon.push(new Phaser.Geom.Point(x1, y1));
 				graphics.lineTo(x1, y1);
 			}
+			graphics.fillStyle(0xFFFFFF, 0.1);
 			graphics.fillPath();
 			clientData.visionMask.setShape(graphics);
 		}
