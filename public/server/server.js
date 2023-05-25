@@ -166,8 +166,10 @@ export default function activity(server) {
                         return;
                     }
                     init();
-                    server.broadcast("start", serverService.rule.startTime);
-                    server.broadcast("chat", { id: "System", chat: "game started!" });
+                    setTimeout(() => {
+                        server.broadcast("start", serverService.rule.startTime);
+                        server.broadcast("chat", { id: "System", chat: "game started!" });
+                    }, 500);
                     startBtn.style.display = "none";
                 }
                 startPollingFunc();

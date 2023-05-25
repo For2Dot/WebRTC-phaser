@@ -16,8 +16,6 @@ export default class Player extends Entity {
 		];
 		this.images[0].toggleFlipX();
 		this.images[1].setVisible(false);
-		if (meta.connId === clientData.connId)
-			this.images.push(new Phaser.GameObjects.Image(clientData.scene, 0, 0, "my_bar"));
 		this.images.forEach(x => {
 			clientData.scene.add.existing(x);
 			this.gameObject.add(x);
@@ -25,11 +23,6 @@ export default class Player extends Entity {
 		this.images[0].setMask(clientData.visionMask);
 		this.lastFootprint = Date.now();
 		this.lastFire = Date.now();
-		if (this.meta.connId == clientData.connId)
-		{
-			this.images[2].depth = 1;
-			this.images[2].scaleY = 0.5;
-		}
 	}
 
 	static prelodad(scene) {
@@ -82,8 +75,13 @@ export default class Player extends Entity {
 
 	updateMybar()
 	{
-		if (this.meta.connId !== clientData.connId)
+		if (this.meta.connId === clientData.connId)
 			return;
+		if (this.images[2] == null) {
+			this.images[2] = new Phaser.GameObjects.Image(clientData.scene, 0, 0, "my_bar");
+			this.images[2].depth = 1;
+			this.images[2].scaleY = 0.5;
+		}
 		this.images[2].x = this.x;
 		this.images[2].y = this.y + 16;
 		this.images[2].scaleX = this.meta.stamina / constant.maximumStamina;
