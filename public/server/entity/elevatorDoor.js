@@ -88,10 +88,10 @@ export class ElevatorDoor extends Entity {
             return;
 
         const target = serverData.entityBodyMap[targetBody.id];
-        if (target.entityType === entityType.PLAYER && target.key[input.INTERACT])
+        if (target.entityType === entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT])
             this.interact(target.playerType);
             
-        if (target.entityType === entityType.PLAYER && target.key[input.INTERACT])
+        if (target.entityType === entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT])
             if (target.playerType === playerType.THIEF)
                 if (this.isOpened)
                     target.isEscaped = true;

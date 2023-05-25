@@ -46,11 +46,11 @@ export class Player extends Entity {
 
     update(delta) {
         if (this.isImprisoned){
+            this.sprintValue = 1;
             Matter.Body.setVelocity(this.body, {
                 x: 0,
                 y: 0,
             },);
-            return ;
         }
         const isRight = this.key[input.RIGHT];
         const isLeft = this.key[input.LEFT];
@@ -69,8 +69,10 @@ export class Player extends Entity {
             this.lastFace = input.RIGHT;
         else if (isLeft)
             this.lastFace = input.LEFT;
-        this.isFire = this.key[input.FIRE] ? this.fire(delta) : this.notFire(delta);
-        this.isSprint = this.key[input.SPRINT] ? this.sprint(delta) : this.notSprint(delta);
+        if (!this.isImprisoned){
+            this.isFire = this.key[input.FIRE] ? this.fire(delta) : this.notFire(delta);
+            this.isSprint = this.key[input.SPRINT] ? this.sprint(delta) : this.notSprint(delta);
+        }
         const dx = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
         const dy = (isDown ? 1 : 0) + (isUp ? -1 : 0);
         const x = dx * this.sprintValue * delta * this.speed;
@@ -123,6 +125,7 @@ export class Player extends Entity {
     imprison() {
         this.isImprisoned = true;
         this.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
+        this.speed = 10;
         serverService.rule.checkAlive(this);
     }
 
@@ -146,6 +149,7 @@ export class Player extends Entity {
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
             if (!this.isImprisoned) return ;
+            this.speed = 50;
             this.isImprisoned = false;
             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = false;
         }
