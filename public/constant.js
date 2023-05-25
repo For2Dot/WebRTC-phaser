@@ -16,7 +16,6 @@ export const playerType = {
 export const entityType = {
     ENTITY: "entity",
     PLAYER: "player",
-    TESTBALL: "testBall",
     WALL: "wall",
     DOOR: "door",
     EVDOOR: "elevatorDoor",
@@ -47,7 +46,7 @@ export const doorType = {
 }
 
 export const constant = {
-    playerCnt: 3,
+    playerCnt: 4,
     clientLerp: 0.3,
     clientZoom: 2,
     keyMap: [
@@ -68,5 +67,5 @@ export const constant = {
     fireStamina: 100,
     maximumStamina: 100,
     gameOverTime: 300,
-    generatorCnt: 1,
+    generatorCnt: 8,
 }

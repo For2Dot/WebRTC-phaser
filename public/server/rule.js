@@ -5,8 +5,6 @@ export class Rule {
     constructor() {
         this.startTime = Date.now();
         this.electricity = false;
-        // exit 4개 까지 가능
-        // this.isEscapingInExit = [false, false, false, false];
     }
 
     gameOver = () => {
@@ -34,6 +32,7 @@ export class Rule {
             if (thief.body.position.x > exit.x - exit.width / 2 - 8 && thief.body.position.x < exit.x + exit.width / 2 + 8
                 && thief.body.position.y > exit.y - exit.height / 2 - 8 && thief.body.position.y < exit.y + exit.height / 2 + 8) {
                 thief.isEscaped = true;
+                thief.gameResultType = gameResultType.WIN;
                 console.log('escaped', thief);
             }
         });
