@@ -1,5 +1,5 @@
 import Entity from "./entity.js";
-import { constant, entityType, playerType } from "../../constant.js";
+import { constant, entityType, playerType, input} from "../../constant.js";
 import { clientData } from "../client.js";
 
 export default class Player extends Entity {
@@ -8,10 +8,13 @@ export default class Player extends Entity {
 		this.entityType = entityType.PLAYER;
 		this.playerType = this.meta.playerType;
 		this.stamina = this.meta.stamina;
+		this.lastFace = input.RIGHT;
+		this.playerImage = this.meta.playerType === playerType.POLICE ? "police" : "thief";
 		this.images = [
-			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "female", "townsfolk_f_idle_1"),
+			new Phaser.GameObjects.Image(clientData.scene, 0, 0, this.playerImage),
 			new Phaser.GameObjects.Image(clientData.scene, 0, 0, "jail"),
 		];
+		this.images[0].toggleFlipX();
 		this.images[1].setVisible(false);
 		if (meta.connId === clientData.connId)
 			this.images.push(new Phaser.GameObjects.Image(clientData.scene, 0, 0, "my_bar"));
@@ -30,7 +33,8 @@ export default class Player extends Entity {
 	}
 
 	static prelodad(scene) {
-		scene.load.atlas('female', '../assets/images/female.png', '../assets/images/female_atlas.json');
+		scene.load.image("police", '../assets/images/police.png');
+		scene.load.image("thief", '../assets/images/thief.png');
 		scene.load.image("jail", '../assets/images/jail.png');
 		scene.load.image("footprint", '../assets/images/footprint.png');
 		scene.load.image("circle", '../assets/images/circle.png');
@@ -94,8 +98,17 @@ export default class Player extends Entity {
 		this.images[1].y = this.y + 8;
 	}
 
+	updatePlayerImage(){
+		this.images[0].y = this.y + 8;
+		if (this.lastFace !== this.meta.lastFace){
+			this.images[0].toggleFlipX();
+			this.lastFace = this.meta.lastFace;
+		}
+	}
+
 	update() {
 		super.update();
+		this.updatePlayerImage();
 		this.updateFootprint();
 		this.updateFireBulletFx();
 		this.updateMybar();

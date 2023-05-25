@@ -3,18 +3,18 @@ import { constant, entityType, input, bodyCategory, bodyLabel } from "../../cons
 import { serverData } from "../server.js";
 
 export class Door extends Entity {
-    constructor(x, y, code) {
-        super(Matter.Bodies.rectangle(x, y,
-            constant.blockCenter,
-            constant.blockCenter,
+    constructor(x, y, w, h, type) {
+        super(Matter.Bodies.rectangle(x, y, w, h,
             {
                 isStatic: true,
                 collisionFilter: { category: bodyCategory.SENSOR_TARGET }
             },
         ));
+        this.width = w;
+        this.height = h;
         this.entityType = entityType.DOOR;
         this.body.label = entityType.DOOR;
-        this.wallCode = code;
+        this.doorType = type;
         this.isStatic = true;
         this.isOpened = false;
         this.lastSwitched = Date.now();
@@ -23,9 +23,10 @@ export class Door extends Entity {
     toDTO() {
         return {
             ...super.toDTO(),
-            width: constant.blockCenter,
-            height: constant.blockCenter,
+            width: this.width,
+            height: this.height,
             isOpened: this.isOpened,
+            doorType: this.doorType,
         }
     }
 

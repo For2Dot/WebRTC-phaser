@@ -41,6 +41,11 @@ export const bodyCategory = {
     SENSOR_TARGET: 4,
 }
 
+export const doorType = {
+    VERTICAL: "vertical",
+    HORIZONTAL: "horizontal",
+}
+
 export const constant = {
     playerCnt: 3,
     clientLerp: 0.3,

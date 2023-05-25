@@ -41,7 +41,7 @@ export class Player extends Entity {
         this.isImprisoned = false;
         this.isEscaped = false;
         this.isSensor = false;
-
+        this.lastFace = input.RIGHT;
     }
 
     update(delta) {
@@ -69,7 +69,10 @@ export class Player extends Entity {
             this.damagedByBullet();
         if (this.slowTime > 400)
             this.recovred();
-        
+        if (isRight)
+            this.lastFace = input.RIGHT;
+        else if (isLeft)
+            this.lastFace = input.LEFT;
         this.isFire = this.key[input.FIRE] ? this.fire(delta) : this.notFire(delta);
         this.isSprint = this.key[input.SPRINT] ? this.sprint(delta) : this.notSprint(delta);
         const dx = (isRight ? 1 : 0) + (isLeft ? -1 : 0);
@@ -173,6 +176,7 @@ export class Player extends Entity {
             stamina: this.stamina,
             isImprisoned: this.isImprisoned,
             gameResultType: this.gameResultType,
+            lastFace: this.lastFace,
         }
     }
 
