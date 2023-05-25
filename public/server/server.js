@@ -160,7 +160,11 @@ export default function activity(server) {
                 return;
             server.freezeRoom();
             const startBtn = document.querySelector("#start");
+            let clickStartBtn = false;
             startBtn.addEventListener("click", () => {
+                if (clickStartBtn)
+                    return;
+                clickStartBtn = true;
                 const isAllReady = () => Object.values(lastPing).every(x => x !== null);
                 const startPollingFunc = () => {
                     if (isAllReady() === false) {
