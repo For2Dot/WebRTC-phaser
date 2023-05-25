@@ -164,6 +164,7 @@ export class Player extends Entity {
             isImprisoned: this.isImprisoned,
             gameResultType: this.gameResultType,
             lastFace: this.lastFace,
+            isEscaped: this.isEscaped,
         }
     }
 

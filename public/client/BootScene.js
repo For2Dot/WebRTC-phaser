@@ -1,6 +1,6 @@
 import Player from "./entity/player.js";
 import { clientData } from "./client.js";
-import { constant, entityType } from "../constant.js";
+import { constant, entityType, playerType } from "../constant.js";
 import Entity from "./entity/entity.js";
 import Bullet from "./entity/bullet.js";
 import Wall from "./entity/wall.js";
@@ -112,6 +112,11 @@ export default class BootScene extends Phaser.Scene {
 	update() {
 		if (this.mine != null) {
 			this.updateVisionMask(+this.mine.x, +this.mine.y);
+		}
+		if (this.mine != null && this.mine.meta.isEscaped) {
+			const police = clientData.players.find(x => x.meta.playerType === playerType.POLICE);
+			if (police != null)
+				this.cameras.main.startFollow(police.getMainImage());
 		}
 		for (const id in clientData.entities) {
 			if (clientData.entities[id].meta.isStatic == false)
