@@ -95,7 +95,7 @@ export class Generator extends Entity {
             return;
 
         const target = serverData.entityBodyMap[targetBody.id];
-        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
+        if (target.entityType == entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT] == true)
             this.interact(target.playerType);
         if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == false)
             this.genSpeed = 0;

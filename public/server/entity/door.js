@@ -67,7 +67,7 @@ export class Door extends Entity {
         if (targetBody.label !== bodyLabel.PLAYER_SENSOR)
             return;
         const target = serverData.entityBodyMap[targetBody.id];
-        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == true)
+        if (target.entityType == entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT] == true)
             this.interact();
     };
 }
