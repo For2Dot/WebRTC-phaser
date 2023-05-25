@@ -111,12 +111,13 @@ export default class BootScene extends Phaser.Scene {
 
 	update() {
 		if (this.mine != null) {
-			this.updateVisionMask(+this.mine.x, +this.mine.y);
-		}
-		if (this.mine != null && this.mine.meta.isEscaped) {
 			const police = clientData.players.find(x => x.meta.playerType === playerType.POLICE);
-			if (police != null)
+			const isEscaped = this.mine.meta.isEscaped;
+			const x = isEscaped ? +police.x : +this.mine.x;
+			const y = isEscaped ? +police.y : +this.mine.y;
+			if (this.mine.meta.isEscaped)
 				this.cameras.main.startFollow(police.getMainImage());
+			this.updateVisionMask(x, y);
 		}
 		for (const id in clientData.entities) {
 			if (clientData.entities[id].meta.isStatic == false)
