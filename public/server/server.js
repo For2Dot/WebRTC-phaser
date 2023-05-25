@@ -5,7 +5,7 @@ import { Player } from "./entity/player.js";
 import { Wall } from "./entity/wall.js";
 import { Door } from "./entity/door.js";
 import { Generator } from "./entity/generator.js";
-import { ElevatorDoor } from "./entity/elevatordoor.js";
+import { ElevatorDoor } from "./entity/elevatorDoor.js";
 import { Rule } from "./rule.js";
 import { clientData } from "../client/client.js";
 
