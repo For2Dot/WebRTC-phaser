@@ -1,5 +1,5 @@
 import Entity from "./entity.js";
-import { entityType } from "../../constant.js";
+import { entityType, doorType } from "../../constant.js";
 import { clientData } from "../client.js";
 
 export default class Door extends Entity {
@@ -11,6 +11,10 @@ export default class Door extends Entity {
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'door-c'),
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'door-o'),
         ];
+        if (this.meta.doorType === doorType.VERTICAL){
+            this.images[0].rotation = 1.5705;
+            this.images[1].rotation = 1.5705;
+        }
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
             this.gameObject.add(x);

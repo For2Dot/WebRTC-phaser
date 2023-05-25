@@ -1,5 +1,5 @@
 import { Server } from "./webrtc.js";
-import { constant, entityType } from "../constant.js";
+import { constant, entityType, doorType } from "../constant.js";
 import { Entity } from "./entity/entity.js";
 import { Player } from "./entity/player.js";
 import { Wall } from "./entity/wall.js";
@@ -99,8 +99,10 @@ export default function activity(server) {
         }));
         refinedMap.filter(x => x.label === "wall")
             .forEach(x => serverService.addEntity(new Wall(x.x, x.y, x.width, x.height)));
-        refinedMap.filter(x => x.label === "door")
-            .forEach(x => serverService.addEntity(new Door(x.x, x.y, x.width, x.height)));
+        refinedMap.filter(x => x.label === "doorH")
+            .forEach(x => serverService.addEntity(new Door(x.x, x.y, x.width, x.height, doorType.HORIZONTAL)));
+        refinedMap.filter(x => x.label == "doorV")
+            .forEach(x => serverService.addEntity(new Door(x.x, x.y, x.width, x.height, doorType.VERTICAL)));
         refinedMap.filter(x => x.label === "elevator")
             .forEach(x => serverService.addEntity(new ElevatorDoor(x.x, x.y, x.width, x.height)));
         randomPick(refinedMap.filter(x => x.label === "generator"), constant.generatorCnt)
