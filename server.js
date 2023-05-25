@@ -10,20 +10,31 @@ app.set('view engine', 'ejs');
 app.use(express.static("public"));
 
 app.get("/", async (req, res, next) => {
-    const roomInfo = Object.values(rooms).map(room => {
-        return {
-            roomId: room.roomId,
-            user_cnt: room.user_cnt,
-            host: room.host,
-        };
-    });
+    const roomInfo = Object.values(rooms).map(room => ({
+        roomId: room.roomId,
+        user_cnt: room.user_cnt,
+        host: room.host,
+        private: room.private,
+    })).filter(x => x.private === false);
 
     res.render("index", { room_list: roomInfo });
 });
 
 app.get("/new", async (req, res, next) => {
     const roomId = Math.random().toString(36).slice(2, 16);
-    rooms[roomId] = {};
+    rooms[roomId] = {
+        createdAt: Date.now(),
+        private: false,
+    };
+    res.redirect(`/join/${roomId}`);
+});
+
+app.get("/private", (req, res, next) => {
+    const roomId = Math.random().toString(36).slice(2, 16);
+    rooms[roomId] = {
+        createdAt: Date.now(),
+        private: true,
+    };
     res.redirect(`/join/${roomId}`);
 });
 
@@ -66,6 +77,8 @@ wss.on("connection", socket => {
             return;
         await hostSocket.join(connId);
         await socket.join(connId);
+        if (rooms[roomId] == null)
+            return;
         socket.to(connId).emit("offer", { connId, offer });
         rooms[roomId].user_cnt = (rooms[roomId].user_cnt || 0) + 1;
     });
@@ -90,3 +103,14 @@ wss.on("connection", socket => {
 app.get("/edit", (req, res, next) => {
     res.render("edit");
 });
+
+setInterval(() => {
+    const now = Date.now();
+    for (const roomId in rooms) {
+        const room = rooms[roomId];
+        if (room.createdAt + 3 * 60 * 1000 < now) {
+            console.log("delete auth: ", room.createdAt, now);
+            delete rooms[roomId];
+        }
+    }
+}, 1 * 60 * 1000);
