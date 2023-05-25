@@ -21,7 +21,7 @@ class Network {
         this.isHost = false;
         this.dataSendPerSec = 0;
         this.dataRecvPerSec = 0;
-
+        this.disconnected = false;
 
         /**
          * @type {Object<string, Array<dataListener>>}
@@ -70,6 +70,7 @@ class Network {
             doc_data_flow_recv.innerText = `⬇️ ${(this.dataRecvPerSec / 1024).toFixed(2)}kb/s`;
             this.dataSendPerSec = 0;
             this.dataRecvPerSec = 0;
+            this.socket.emit("pingToSocket", { roomId: this.roomId });
         }, 1000);
     }
 
@@ -238,18 +239,26 @@ class Connection {
      * @param {string} msg 
      */
     send(msg) {
-        var chunkSize = 65535
-        while (msg.length > 0) {
-            if (this.channel.bufferedAmount > this.channel.bufferedAmountLowThreshold) {
-                this.channel.onbufferedamountlow = () => {
-                    this.channel.onbufferedamountlow = null;
-                    this.send(msg);
-                };
-                return;
+        var chunkSize = 65535;
+        try {
+            while (msg.length > 0) {
+                if (this.channel.bufferedAmount > this.channel.bufferedAmountLowThreshold) {
+                    this.channel.onbufferedamountlow = () => {
+                        this.channel.onbufferedamountlow = null;
+                        this.send(msg);
+                    };
+                    return;
+                }
+                const chunk = msg.slice(0, chunkSize);
+                msg = msg.slice(chunkSize, msg.length);
+                this.channel.send(chunk);
             }
-            const chunk = msg.slice(0, chunkSize);
-            msg = msg.slice(chunkSize, msg.length);
-            this.channel.send(chunk);
+        } catch (e) {
+            if (this.disconnected) 
+                return;
+            this.disconnected = true;
+            alert("Disconnected from server");
+            window.history.back();
         }
     }
 
@@ -339,7 +348,7 @@ export class Server extends Node {
      */
     freezeRoom() {
         if (this.net === null)
-        return;
+            return;
         this.net.freezeRoom();
     }
 

@@ -14,7 +14,6 @@ export class Generator extends Entity {
         this.wallCode = code;
         this.isStatic = true;
         this.genProcess = 0;
-        this.genSpeed = 0;
         this.progressRate = 0;
         this.lastSwitched = Date.now();
         this.isWorking = false;
@@ -34,29 +33,21 @@ export class Generator extends Entity {
 
     reset() {
         this.genProcess = 0;
-        this.genSpeed = 0;
         this.progressRate = 0;
         this.lastSwitched = Date.now();
         this.isWorking = false;
     }
 
     generate() {
-
         setInterval(() => {
-
-            if (this.genSpeed == 0 && this.genProcess > 0 && this.genProcess < 1000)
+            if (Date.now() - this.lastSwitched < 500)
+                return;
+            
+            if (this.genProcess > 0 && this.genProcess < 1000)
                 this.genProcess -= 10;
-            else if (this.genSpeed > 0 && this.genProcess < 1000)
-                this.genProcess += this.genSpeed;
-
-            if (this.genSpeed > 0)
-                this.genSpeed -= 1;
-
             if (this.genProcess < 0)
                 this.genProcess = 0;
-
             this.progressRate = (this.genProcess / 10).toFixed(0);
-
         }, 200);
     }
 
@@ -64,17 +55,15 @@ export class Generator extends Entity {
         if (this.isWorking == true)
             return;
         if (who === playerType.THIEF) {
-
-            if (Date.now() - this.lastSwitched > 100) {
-
-                if (this.genSpeed < 20)
-                    this.genSpeed += 1;
-                this.genProcess += 10;
-
+            if (Date.now() - this.lastSwitched > 200) {
                 if (this.genProcess >= 1000) {
                     this.isWorking = true;
                     this.genProcess = 1000;
                     serverService.rule.checkGenerator();
+                } else if (this.genProcess < 1000)
+                {
+                    this.genProcess += 40;
+                    this.progressRate = (this.genProcess / 10).toFixed(0);
                 }
                 this.lastSwitched = Date.now();
             }
@@ -97,7 +86,5 @@ export class Generator extends Entity {
         const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType == entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT] == true)
             this.interact(target.playerType);
-        if (target.entityType == entityType.PLAYER && target.key[input.INTERACT] == false)
-            this.genSpeed = 0;
     };
 }

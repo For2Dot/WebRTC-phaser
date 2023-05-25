@@ -25,6 +25,7 @@ app.get("/new", async (req, res, next) => {
     rooms[roomId] = {
         createdAt: Date.now(),
         private: false,
+        lastPing: Date.now(),
     };
     res.redirect(`/join/${roomId}`);
 });
@@ -34,6 +35,7 @@ app.get("/private", (req, res, next) => {
     rooms[roomId] = {
         createdAt: Date.now(),
         private: true,
+        lastPing: Date.now(),
     };
     res.redirect(`/join/${roomId}`);
 });
@@ -98,6 +100,17 @@ wss.on("connection", socket => {
         if (rooms[roomId])
             delete rooms[roomId];
     });
+    socket.on("pingToSocket", (payload) => {
+        const { roomId } = payload;
+        if (rooms[roomId] == null)
+        {
+            console.log("disconnect", socket.id);
+            socket.disconnect();
+            return;
+        }
+        if (rooms[roomId] != null && rooms[roomId].lastPing != null)
+            rooms[roomId].lastPing = Date.now();
+    });
 });
 
 app.get("/edit", (req, res, next) => {
@@ -105,12 +118,10 @@ app.get("/edit", (req, res, next) => {
 });
 
 setInterval(() => {
-    const now = Date.now();
-    for (const roomId in rooms) {
-        const room = rooms[roomId];
-        if (room.createdAt + 3 * 60 * 1000 < now) {
-            console.log("delete auth: ", room.createdAt, now);
-            delete rooms[roomId];
+    Object.values(rooms).forEach(room => {
+        if (room.lastPing && Date.now() - room.lastPing > 5000 ) {
+            console.log("room", room.roomId, "is closed");
+            delete rooms[room.roomId];
         }
-    }
-}, 1 * 60 * 1000);
+    });
+}, 3000);

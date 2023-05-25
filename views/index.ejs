@@ -35,6 +35,18 @@
         function openRoom(private) {
             window.location.href = private ? "private" : "new";
         }
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        if (isMobileDevice()) {
+            alert("PC에서 접속해주세요.");
+            window.history.back();
+        }
+
+        if (navigator.userAgent.indexOf("Chrome") === -1) {
+            alert("우리는 Chrome 브라우저를 사랑합니다.");
+            window.history.back();
+        }
     </script>
 </body>
 
