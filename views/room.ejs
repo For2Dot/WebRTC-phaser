@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <title>For2Dot</title>
-  <link rel="shortcut icon" type="image/ico" href="../assets/images/favicon.ico"/>
+  <link rel="shortcut icon" type="image/ico" href="../assets/images/favicon.ico" />
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/phaser-matter-collision-plugin"></script>
@@ -14,25 +14,29 @@
 </head>
 
 <body>
-  <div id="chat-panel">
-    <div id="status-panel">
-      <h1>For2Dot</h1>
-      <span id="ping"></span>
-      <div id="data-flow-panel">
-        <span id="data-flow-send"></span>
-        <span id="data-flow-recv"></span>
-      </div>
-      <div id="data-flow-panel">
-        <span id="left-time"></span>
-      </div>
-    </div>
+  <!-- left top -->
+  <div id="connection-status" class="ab left-top">
+      <span id="data-flow-send"></span>
+      <span id="data-flow-recv"></span>
+      <span id="ping">ping : </span>
+  </div>
+  <!-- right top -->
+  <div id="game-progress" class="ab right-top">
+    <h1 id="left-time"></h1>
+    <div id="generators"></div>
+    <div id="imprisoned"></div>
+  </div>
+
+  <!-- right bottom -->
+  <div id="chat-panel" class="ab right-btm">
     <div>
-      <textarea id="messages" disabled></textarea>
+      <textarea id="messages" disabled>123</textarea>
     </div>
     <div>
       <input type="text" id="message" size="50">
     </div>
   </div>
+
   <div id="simple-game">
     <% if (isHost) { %>
       <button id="start" disabled>start</button>

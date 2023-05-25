@@ -11,6 +11,7 @@ import ElevatorDoor from "./entity/elevatorDoor.js";
 
 export const clientData = {
     players: [],
+    generators: [],
     /**
      * @type {Object<number, Entity>}
      */
@@ -103,6 +104,7 @@ export default function activity(client) {
         clientData.isStarted = true;
         startTime = payload;
         client.send("start");
+
     });
 
     client.addEventListener("frame", ({ connId, payload }) => {
@@ -158,7 +160,14 @@ export default function activity(client) {
         if (clientData.isStarted) {
             let leftTime = (startTime + constant.gameOverTime * 1000) - Date.now();
             leftTime = leftTime < 0 ? 0 : leftTime;
-            document.getElementById("left-time").innerText = `남은시간: ${Math.floor(leftTime * 0.001)}`;
+            leftTime *= 0.001;
+            document.getElementById("left-time").innerText = 
+                `⏳ ${Math.floor(leftTime / 60)}:${Math.floor(leftTime % 60) < 10 ? "0" : ""}${Math.floor(leftTime % 60)}`;
+
+            if (leftTime < 30)
+                // change color of left-time
+                document.getElementById("left-time").style.color = "red";
+            gameProgressCounter();
         }
     }, 1000);
 }
@@ -166,4 +175,49 @@ export default function activity(client) {
 function render() {
     const text = chats.map(x => `${x.id}: ${x.chat}`).join("\n");
     document.getElementById("messages").value = text;
+}
+
+function gameProgressCounter() {
+    const gen_counter = document.querySelector(`#generators`);
+    const imprisoned_counter = document.querySelector(`#imprisoned`);
+
+    if (!gen_counter.children.length) {
+        clientData.generators = Object.values(clientData.entities).filter(x => x.meta.type === entityType.GENERATOR);
+        clientData.generators
+            .forEach((x, i) => {
+                const genImg = document.createElement("img");
+                genImg.src = "../assets/images/gen0.png";
+                gen_counter.appendChild(genImg);
+            });
+    } else {
+        clientData.generators
+            .forEach((x, i) => {
+                if (x.meta.progressRate >= 100)
+                    gen_counter.children[i].src = "../assets/images/gen100.png";
+                else if (x.meta.progressRate > 0 && x.meta.progressRate < 100)
+                    gen_counter.children[i].src = "../assets/images/gen50.png";
+                else
+                    gen_counter.children[i].src = "../assets/images/gen0.png";
+            });
+    }
+
+    if (!imprisoned_counter.children.length) {
+        clientData.players
+            .filter(x => x.meta.playerType === playerType.THIEF)
+            .forEach((x, i) => {
+                const circleImg = document.createElement("img");
+                circleImg.src = "../assets/images/circle.png";
+                imprisoned_counter.appendChild(circleImg);
+            });
+    } else {
+        clientData.players
+            .filter(x => x.meta.playerType === playerType.THIEF)
+            .forEach((x, i) => {
+                if (x.meta.isImprisoned)
+                    imprisoned_counter.children[i].src = "../assets/images/jail.png";
+                else
+                    imprisoned_counter.children[i].src = "../assets/images/circle.png";
+            });
+    }
+
 }
