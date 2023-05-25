@@ -28,7 +28,6 @@ export class Player extends Entity {
         this.isFire = false;
         this.isSprint = false;
         this.sprintValue = 1;
-        this.slowTime = 0;
         this.bulletTime = 0;
         this.dx = 1;
         this.dy = 0;
@@ -65,10 +64,6 @@ export class Player extends Entity {
             if (this.lastFireTime + 2000 < Date.now() && this.stamina < constant.maximumStamina)
                 this.stamina += constant.recoveryStaminaPerFrame * delta;
         }
-        if (this.slowTime !== 0)
-            this.damagedByBullet();
-        if (this.slowTime > 400)
-            this.recovred();
         if (isRight)
             this.lastFace = input.RIGHT;
         else if (isLeft)
@@ -124,19 +119,9 @@ export class Player extends Entity {
         return (false);
     }
 
-    damagedByBullet() {
-        ++this.slowTime;
-        this.speed = 10;
-    }
-
-    recovred() {
-        this.slowTime = 0;
-        this.speed = 50;
-    }
-
     imprison() {
         this.isImprisoned = true;
-        this.body.isSensor = true;
+        this.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
         serverService.rule.checkAlive(this);
     }
 
@@ -149,18 +134,19 @@ export class Player extends Entity {
             return;
         const target = serverData.entityBodyMap[targetBody.id];
         const me = serverData.entityBodyMap[myBody.id];
-        if (this.playerType === playerType.THIEF && targetBody.label === bodyLabel.BULLET)
-            this.slowTime = 1;
+        if (this.playerType === playerType.THIEF && myBody.label === bodyLabel.PLAYER && targetBody.label === bodyLabel.BULLET){
+            if (this.isImprisoned) return;
+            serverService.removeEntity(target);
+            this.imprison();
+        }
         else if (target.playerType === playerType.POLICE && this.playerType === playerType.THIEF){
             if (this.isImprisoned) return ;
             this.imprison();
-            me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
             if (!this.isImprisoned) return ;
             this.isImprisoned = false;
             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = false;
-            this.body.isSensor = false;
         }
     }
 
