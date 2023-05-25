@@ -11,7 +11,10 @@ export class Rule {
         Matter.Runner.stop(runner);
 
         const players = serverData.entities.filter(x => x.entityType === entityType.PLAYER);
-        server.broadcast("end", null);
+        const polices = players.filter(x => x.playerType === playerType.POLICE);
+        const thieves = players.filter(x => x.playerType === playerType.THIEF);
+        if (thieves.find(x => x.isImprisoned))
+            server.broadcast("end", null);
     }
 
     checkGameSet = () => {

@@ -83,8 +83,9 @@ export default function activity(client) {
     let ping_ms = 0;
     let startTime = null;
 
-    setInterval(render, 50);
     clientData.onKeyEvent = (keyData) => {
+        if (document.querySelector("#message:focus") != null)
+            return;
         if (keyData != null)
             client.send("keyPress", keyData);
     };
@@ -126,10 +127,12 @@ export default function activity(client) {
     });
 
     client.addEventListener("chat", ({ connId, payload }) => {
-        const idx = chats.findIndex(chat => chat.id === payload.id);
-        if (idx === -1)
-            chats.push({ id: payload.id });
-        chats.find(chat => chat.id === payload.id).chat = payload.chat;
+        const { id, chat } = payload;
+        const oldChat = document.getElementById("messages").value;
+        const newChat = `${oldChat}${id}: ${chat}\n`;
+        const textarea = document.getElementById("messages");
+        textarea.value = newChat;
+        textarea.scrollTop = textarea.scrollHeight;
     });
 
     client.addEventListener("end", ({ connId, payload }) => {
@@ -144,8 +147,25 @@ export default function activity(client) {
 
     });
 
-    document.getElementById("message").addEventListener("input", (x) => {
-        client.send("chat", x.currentTarget.value);
+    document.addEventListener('keydown', function(event) {
+        if (event.key != "Enter")
+            return;
+        let focusedInput = document.querySelector("#message:focus");
+        if (focusedInput != null) {
+            focusedInput.blur();
+            if (focusedInput.value != "")
+                client.send("chat", focusedInput.value);
+            focusedInput.value = "";
+        } else {
+            Object.keys(clientData.keyPressed)
+                .filter(key => clientData.keyPressed[key])
+                .forEach(key => {
+                    clientData.keyPressed[key] = false;
+                    const pressedKey = constant.keyMap.find(x => x.key === key);
+                    client.send("keyPress", { ...pressedKey, state: false });
+                })
+            document.getElementById("message").focus();
+        }
     });
 
 
@@ -170,11 +190,6 @@ export default function activity(client) {
             gameProgressCounter();
         }
     }, 1000);
-}
-
-function render() {
-    const text = chats.map(x => `${x.id}: ${x.chat}`).join("\n");
-    document.getElementById("messages").value = text;
 }
 
 function gameProgressCounter() {
