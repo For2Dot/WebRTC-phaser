@@ -77,6 +77,8 @@ wss.on("connection", socket => {
             return;
         await hostSocket.join(connId);
         await socket.join(connId);
+        if (rooms[roomId] == null)
+            return;
         socket.to(connId).emit("offer", { connId, offer });
         rooms[roomId].user_cnt = (rooms[roomId].user_cnt || 0) + 1;
     });
@@ -101,3 +103,14 @@ wss.on("connection", socket => {
 app.get("/edit", (req, res, next) => {
     res.render("edit");
 });
+
+setInterval(() => {
+    const now = Date.now();
+    for (const roomId in rooms) {
+        const room = rooms[roomId];
+        if (room.createdAt + 3 * 60 * 1000 < now) {
+            console.log("delete auth: ", room.createdAt, now);
+            delete rooms[roomId];
+        }
+    }
+}, 1 * 60 * 1000);

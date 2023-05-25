@@ -18,7 +18,7 @@
         <ul>
             <% room_list.forEach(room=> { %>
                 <a href="/join/<%= room.roomId %>">
-                    <%= room.host %>'s room (<%= room.user_cnt %> / 4)
+                    <%= room.roomId %> (<%= room.user_cnt %> / 4)
                 </a>
                 <% }); %>
         </ul>
