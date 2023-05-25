@@ -3,7 +3,7 @@ import { serverService, serverData } from '../server.js';
 import { constant, entityType, input, bodyCategory, bodyLabel, playerType } from "../../constant.js";
 
 export class ElevatorDoor extends Entity {
-    constructor(x, y, code) {
+    constructor(x, y, w, h, group) {
         super(Matter.Bodies.rectangle(x, y,
             constant.blockCenter,
             constant.blockCenter,
@@ -14,11 +14,11 @@ export class ElevatorDoor extends Entity {
         ));
         this.entityType = entityType.EVDOOR;
         this.body.label = entityType.EVDOOR;
-        this.wallCode = code;
         this.isStatic = true;
         this.isOpened = false;
         this.lastSwitched = Date.now();
         this.alertType = 0;
+        this.group = group;
     }
 
     toDTO() {
@@ -31,15 +31,27 @@ export class ElevatorDoor extends Entity {
         }
     }
 
-    openDoor() {
+    openDoor(byOther = false) {
         this.body.isSensor = true;
         this.isOpened = true;
+
+        if (byOther)
+            return ;
+
+        serverData.entities.filter(x => x.entityType === entityType.EVDOOR && x.group === this.group && x !== this && x.isOpened === false)
+            .forEach(x => x.openDoor(true));
     }
 
-    closeDoor() {
+    closeDoor(byOther = false) {
         this.body.isSensor = false;
         this.isOpened = false;
-        serverService.rule.checkGameSet();
+
+        if (byOther)
+            return ;
+
+        serverData.entities.filter(x => x.entityType === entityType.EVDOOR && x.group === this.group && x !== this && x.isOpened === true)
+            .forEach(x => x.closeDoor(true));
+        serverService.rule.checkGameSet(this.group);
         serverService.rule.resetGenerators();
     }
 

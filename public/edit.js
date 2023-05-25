@@ -21,10 +21,12 @@ const labels = [
     { key: "Digit2", color: "#F00", name: "doorH" },
     { key: "Digit3", color: "#0F0", name: "doorV" },
     { key: "Digit4", color: "#FF0", name: "generator" },
-    { key: "Digit5", color: "#00F", name: "elevator" },
-    { key: "Digit6", color: "#F0F", name: "police" },
-    { key: "Digit7", color: "#0FF", name: "thief" },
-    { key: "Digit8", color: "#FFF", name: "exit" },
+    { key: "Digit5", color: "#F0F", name: "police" },
+    { key: "Digit6", color: "#0FF", name: "thief" },
+    { key: "Digit7", color: "#00F", name: "elevator1" },
+    { key: "Digit8", color: "#FFF", name: "exit1" },
+    { key: "KeyQ", color: "#55A", name: "elevator2" },
+    { key: "KeyW", color: "#A55", name: "exit2" },
 ]
 let blocks = [];
 let stack = [];

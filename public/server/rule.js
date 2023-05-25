@@ -5,6 +5,7 @@ export class Rule {
     constructor() {
         this.startTime = Date.now();
         this.electricity = false;
+        this.checkingGameSet = false;
     }
 
     gameOver = () => {
@@ -22,9 +23,26 @@ export class Rule {
             .map(x => x.toDTO()));
     }
 
-    checkGameSet = () => {
+
+    checkGameSet = (Exitgroup) => {
+        if (this.checkingGameSet) return;
+        this.checkingGameSet = true;
+
         const players = serverData.entities.filter(x => x.entityType === entityType.PLAYER);
         const thieves = players.filter(x => x.playerType === playerType.THIEF);
+        const exit = serverData.exits[`exit${Exitgroup}`];
+        console.log(exit);
+
+        thieves.forEach(thief => {
+            console.log(thief.body.position);
+
+            if (thief.body.position.x > exit.x - exit.width / 2 && thief.body.position.x < exit.x + exit.width / 2
+                && thief.body.position.y > exit.y - exit.height / 2 && thief.body.position.y < exit.y + exit.height / 2) {
+                thief.isEscaped = true;
+                // serverService.removeEntity(thief);
+                // server.broadcast("escape", { id: thief.connId });
+            }
+        });
 
         /**
          * Todo

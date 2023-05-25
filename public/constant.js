@@ -22,6 +22,7 @@ export const entityType = {
     EVDOOR: "elevatorDoor",
     GENERATOR: "generator",
     BULLET: "bullet",
+    EXIT: "exit",
 }
 
 export const gameResultType = {
@@ -68,5 +69,5 @@ export const constant = {
     fireStamina: 100,
     maximumStamina: 100,
     gameOverTime: 300,
-    generatorCnt: 8,
+    generatorCnt: 1,
 }

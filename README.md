@@ -1,5 +1,24 @@
 # Object Interaction
 
+
+
+# commit msg
+```
+1. replaced UI
+2. added game progress icons (gen, prison)
+3. reworked timer
+```
+
+# TODO
+- 엔터로 채팅 활성화/비활성화 (focus 지우기)
+- 엘베 탈출
+- 새 채팅이 오면 잘 보이다가 점차 사라짐
+- 
+
+
+---
+
+
 ### 상호작용 기능 (E 키)
 1. 사용 가능할때 이펙트 보이기
 3. 상호 작용에는 각 오브젝트에 따라 시간이 필요.
@@ -11,10 +30,6 @@
 
 ---
 
-### Todo
-1. 상호작용 키 만들기 (E 키)
-2. 상호작용이 가능한 위치에서 E키를 사용할 수 있다는 표시.
-3. 문 열고 닫기 만들기.
 
 ### Objects
 1. 문

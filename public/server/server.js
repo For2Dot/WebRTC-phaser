@@ -7,6 +7,8 @@ import { Door } from "./entity/door.js";
 import { Generator } from "./entity/generator.js";
 import { ElevatorDoor } from "./entity/elevatordoor.js";
 import { Rule } from "./rule.js";
+import { clientData } from "../client/client.js";
+import { Exit } from "./entity/exit.js";
 
 const tiles = await fetch("/assets/map.json").then(x => x.json());
 
@@ -32,6 +34,7 @@ export const serverData = {
      * @type {Object<number, Entity>}
      */
     entityBodyMap: {},
+    exits: {},
 };
 
 export const serverService = {
@@ -108,10 +111,16 @@ export default function activity(server) {
             .forEach(x => serverService.addEntity(new Door(x.x, x.y, x.width, x.height, doorType.HORIZONTAL)));
         refinedMap.filter(x => x.label == "doorV")
             .forEach(x => serverService.addEntity(new Door(x.x, x.y, x.width, x.height, doorType.VERTICAL)));
-        refinedMap.filter(x => x.label === "elevator")
-            .forEach(x => serverService.addEntity(new ElevatorDoor(x.x, x.y, x.width, x.height)));
+        refinedMap.filter(x => x.label === "elevator1")
+            .forEach(x => serverService.addEntity(new ElevatorDoor(x.x, x.y, x.width, x.height, 1)));
+        refinedMap.filter(x => x.label === "exit1")
+            .forEach(x => { serverData.exits[x.label] = x;  serverService.addEntity(new Exit(x.x, x.y, x.width, x.height, 1))});
+        refinedMap.filter(x => x.label === "elevator2")
+            .forEach(x => serverService.addEntity(new ElevatorDoor(x.x, x.y, x.width, x.height, 2)));
+        refinedMap.filter(x => x.label === "exit2")
+            .forEach(x => {serverData.exits[x.label] = x; serverService.addEntity(new Exit(x.x, x.y, x.width, x.height, 2))});
         randomPick(refinedMap.filter(x => x.label === "generator"), constant.generatorCnt)
-            .forEach(x => serverService.addEntity(new Generator(x.x, x.y, x.width, x.height)));
+            .forEach(x => { console.log(x); serverService.addEntity(new Generator(x.x, x.y, x.width, x.height))});
         const thiefPositions = randomPick(refinedMap.filter(x => x.label === "thief"), constant.playerCnt - 1);
         const policePositions = randomPick(refinedMap.filter(x => x.label === "police"), 1);
         for (const idx in serverData.players) {
