@@ -12,8 +12,8 @@ export default class Door extends Entity {
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, 'door-o'),
         ];
         if (this.meta.doorType === doorType.VERTICAL){
-            this.images[0].rotation = 1.5705;
-            this.images[1].rotation = 1.5705;
+            this.images[0].rotation = Math.PI / 2;
+            this.images[1].rotation = Math.PI / 2;
         }
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
