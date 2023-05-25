@@ -8,6 +8,7 @@ export default class Entity {
         this.meta = meta;
         this.gameObject = clientData.scene.add.group();
         this.isInVisionMask = false;
+        this.delAction = null;
     }
 
     getGameObject() {
@@ -33,6 +34,8 @@ export default class Entity {
 
     update() {
         let { x, y } = this.meta;
+        const dx = this.x - this.meta.x;
+        const dy = this.y - this.meta.y;
         if (this.x != null && this.y != null) {
             x = (x * constant.clientLerp + this.x * (1 - constant.clientLerp));
             y = (y * constant.clientLerp + this.y * (1 - constant.clientLerp));
@@ -40,5 +43,12 @@ export default class Entity {
         this.x = x;
         this.y = y;
         this.setPosition(x, y);
+        const distance = dx * dx + dy * dy;
+        if (this.delAction != null && distance < 10)
+            this.delAction();
+    }
+
+    deleteLerp(delAction) {
+        this.delAction = delAction;
     }
 }

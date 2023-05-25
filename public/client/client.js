@@ -44,10 +44,12 @@ export const addEntity = (entity) => {
  * @param {Entity} entity 
  */
 export const removeEntity = (entity) => {
-    if (entity.entityType === entityType.PLAYER)
-        clientData.players = clientData.players.filter(x => x.id === entity.id);
-    delete clientData.entities[entity.meta.id];
-    entity.destroy();
+    entity.deleteLerp(() => {
+        if (entity.entityType === entityType.PLAYER)
+            clientData.players = clientData.players.filter(x => x.id === entity.id);
+        delete clientData.entities[entity.meta.id];
+        entity.destroy();
+    });
 }
 
 export const createEntity = (meta) => {

@@ -34,6 +34,11 @@ export const serverData = {
      */
     entityBodyMap: {},
     exits: {},
+
+    /**
+     * @type {Array<Entity>}
+     */
+    removeReservedEntities: [],
 };
 
 export const serverService = {
@@ -79,16 +84,7 @@ export default function activity(server) {
     serverService.removeEntity = (entity) => {
         if (serverData.entityBodyMap[entity.body.id] == null)
             return;
-        serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
-        entity.body.parts.forEach(x => {
-            delete serverData.entityBodyMap[x.id];
-        });
-        if (entity.entityType === entityType.PLAYER) {
-            serverData.players = serverData.players.filter(x => x.body.id !== entity?.body?.id);
-            delete serverData.playerMapByConnId[entity.connId];
-        }
-        if (entity.appendToEngine)
-            Matter.Composite.remove(engine.world, entity.body);
+        serverData.removeReservedEntities.push(entity);
     }
 
     serverService.broadcast = (type, data) => {
@@ -190,6 +186,20 @@ export default function activity(server) {
     Matter.Events.on(runner, "beforeUpdate", ({ timestamp, source, name }) => {
         if (serverService.rule.startTime + constant.gameOverTime * 1000 < Date.now())
             serverService.rule.gameOver();
+
+        serverData.removeReservedEntities.forEach(entity => {
+            serverData.entities = serverData.entities.filter(x => x.body.id !== entity?.body?.id);
+            entity.body.parts.forEach(x => {
+                delete serverData.entityBodyMap[x.id];
+            });
+            if (entity.entityType === entityType.PLAYER) {
+                serverData.players = serverData.players.filter(x => x.body.id !== entity?.body?.id);
+                delete serverData.playerMapByConnId[entity.connId];
+            }
+            if (entity.appendToEngine)
+                Matter.Composite.remove(engine.world, entity.body);
+        })
+        serverData.removeReservedEntities = [];
 
         const delta = source.delta * 0.001;
         serverData.entities.forEach((entity) => entity.update(delta));
