@@ -5,8 +5,9 @@
 }
 
 body {
-    background-color: #333;
-    padding: 10px;
+    /* background-color: #212121; */
+    background-color: #1e1e1e;
+    pddding: 10px;
 }
 
 button {
@@ -47,4 +48,16 @@ button {
 #room_list a {
     text-decoration: none;
     margin: 5px 0 5px 0;
+}
+
+#manual {
+    position: absolute;
+    z-index: -99;
+    width: 60vw;
+    right: 0;
+    top: 0;
+}
+
+#manual img {
+    margin: 5px 0 -15px 0;
 }
