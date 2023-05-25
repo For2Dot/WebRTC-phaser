@@ -19,7 +19,7 @@ export class Bullet extends Entity {
         },);
         setTimeout(() => {
             serverService.removeEntity(this);
-        }, 1000);
+        }, 2000);
     }
 
     /**
@@ -30,11 +30,5 @@ export class Bullet extends Entity {
         const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType !== entityType.PLAYER)
             serverService.removeEntity(this);
-        else{
-            if (target.isSensor === true) ;
-            else if (target.playerType === playerType.THIEF &&
-                target.body.parts.find(x => x.label === bodyLabel.PLAYER) != null)
-                serverService.removeEntity(this);
-        }
     }
 }

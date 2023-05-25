@@ -64,7 +64,7 @@ export const constant = {
     footPrintTimeInterval: 0.1,
     footPrintLife: 0.5,
     recoveryStaminaPerFrame: 30,
-    sprintStamina: 50,
+    sprintStamina: 70,
     fireStamina: 100,
     maximumStamina: 100,
     gameOverTime: 300,

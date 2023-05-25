@@ -5,11 +5,10 @@ import { clientData } from "../client.js";
 export default class Bullet extends Entity {
     constructor(meta) {
         super(meta);
-        this.entityType = entityType.ENTITY;
+        this.entityType = entityType.BULLET;
         this.images = [
             new Phaser.GameObjects.Image(clientData.scene, 0, 0, "bullet"),
         ];
-        this.images[0].scale = 0.13;
         this.images.forEach(x => {
             clientData.scene.add.existing(x);
             this.gameObject.add(x);
