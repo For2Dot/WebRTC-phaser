@@ -10,20 +10,31 @@ app.set('view engine', 'ejs');
 app.use(express.static("public"));
 
 app.get("/", async (req, res, next) => {
-    const roomInfo = Object.values(rooms).map(room => {
-        return {
-            roomId: room.roomId,
-            user_cnt: room.user_cnt,
-            host: room.host,
-        };
-    });
+    const roomInfo = Object.values(rooms).map(room => ({
+        roomId: room.roomId,
+        user_cnt: room.user_cnt,
+        host: room.host,
+        private: room.private,
+    })).filter(x => x.private === false);
 
     res.render("index", { room_list: roomInfo });
 });
 
 app.get("/new", async (req, res, next) => {
     const roomId = Math.random().toString(36).slice(2, 16);
-    rooms[roomId] = {};
+    rooms[roomId] = {
+        createdAt: Date.now(),
+        private: false,
+    };
+    res.redirect(`/join/${roomId}`);
+});
+
+app.get("/private", (req, res, next) => {
+    const roomId = Math.random().toString(36).slice(2, 16);
+    rooms[roomId] = {
+        createdAt: Date.now(),
+        private: true,
+    };
     res.redirect(`/join/${roomId}`);
 });
 

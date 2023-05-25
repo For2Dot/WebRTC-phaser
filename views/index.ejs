@@ -11,8 +11,8 @@
     <title>For2Dot</title>
 </head>
 <body>
-    <button onclick="openRoom()">Open</button>
-    <button onclick="joinRoom()">Join</button>
+    <button onclick="openRoom(false)">Public Open</button>
+    <button onclick="openRoom(true)">Private Open</button>
     <div id="room_list">
         <p>room list</p>
         <ul>
@@ -32,8 +32,8 @@
                 return;
             window.location.href = `/join/${roomId}`;
         }
-        function openRoom() {
-            window.location.href = "new";
+        function openRoom(private) {
+            window.location.href = private ? "private" : "new";
         }
     </script>
 </body>
