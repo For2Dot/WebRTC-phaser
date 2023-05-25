@@ -17,5 +17,7 @@ async function startClient() {
 if (isHost) startServer().then(startClient);
 else startClient();
 
+document.getElementById('announce').innerText = `초대코드 : ${roomId}`;
+
 window.server = server;
 window.client = client;

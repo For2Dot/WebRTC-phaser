@@ -103,7 +103,7 @@ export default function activity(client) {
         clientData.connId = connId;
         clientData.isStarted = true;
         startTime = payload;
-        console.log("rev start");
+        document.getElementById('announce').innerText = ``;
     });
 
     client.addEventListener("frame", ({ connId, payload }) => {
@@ -234,7 +234,7 @@ function gameProgressCounter() {
             .filter(x => x.meta.playerType === playerType.THIEF)
             .forEach((x, i) => {
                 const circleImg = document.createElement("img");
-                circleImg.src = "../assets/images/circle.png";
+                circleImg.src = "../assets/images/thief.png";
                 imprisoned_counter.appendChild(circleImg);
             });
     } else {
@@ -244,7 +244,7 @@ function gameProgressCounter() {
                 if (x.meta.isImprisoned)
                     imprisoned_counter.children[i].src = "../assets/images/jail.png";
                 else
-                    imprisoned_counter.children[i].src = "../assets/images/circle.png";
+                    imprisoned_counter.children[i].src = "../assets/images/thief.png";
             });
     }
 
