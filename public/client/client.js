@@ -103,8 +103,7 @@ export default function activity(client) {
         clientData.connId = connId;
         clientData.isStarted = true;
         startTime = payload;
-        client.send("start");
-
+        console.log("rev start");
     });
 
     client.addEventListener("frame", ({ connId, payload }) => {

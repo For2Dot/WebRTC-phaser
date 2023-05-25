@@ -131,9 +131,12 @@ export default function activity(server) {
                 });
             }
         }
+        server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
         serverService.rule = new Rule();
         Matter.Composite.add(engine.world, serverData.players.map(x => x.body));
-        Matter.Runner.run(runner, engine);
+        setTimeout(() => {
+            Matter.Runner.run(runner, engine);
+        }, 500);
     }
 
     server.addEventListener("chat", ({ connId, payload }) => {
@@ -164,10 +167,10 @@ export default function activity(server) {
                         setTimeout(startPollingFunc, 100);
                         return;
                     }
-                    init();
+                    server.broadcast("start", Date.now() + 1000);
+                    server.broadcast("chat", { id: "System", chat: "game started!" });
                     setTimeout(() => {
-                        server.broadcast("start", serverService.rule.startTime);
-                        server.broadcast("chat", { id: "System", chat: "game started!" });
+                        init();
                     }, 500);
                     startBtn.style.display = "none";
                 }
@@ -207,11 +210,7 @@ export default function activity(server) {
     });
 
     Matter.Events.on(runner, "afterUpdate", ({ timestamp, source, name }) => {
-        if (updateCounter++ === 0) {
-            server.broadcast("frame", serverData.entities.map(x => x.toDTO()));
-            return;
-        }
-        if (updateCounter % 2 !== 0)
+        if (updateCounter++ % 2 !== 0)
             return;
         server.broadcast("frame", serverData.entities
             .filter(x => x.entityType !== entityType.WALL)
