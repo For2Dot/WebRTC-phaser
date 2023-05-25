@@ -136,6 +136,21 @@ export default function activity(client) {
     });
 
     client.addEventListener("end", ({ connId, payload }) => {
+        const rawEntities = payload.reduce((acc, cur) => {
+            acc[cur.id] = cur;
+            return acc;
+        }, {});
+        for (const id in clientData.entities) {
+            if (rawEntities[id] == null && clientData.entities[id].meta.type !== entityType.WALL) {
+                removeEntity(clientData.entities[id]);
+            }
+        }
+        for (const id in rawEntities) {
+            if (clientData.entities[id] == null) {
+                addEntity(createEntity(rawEntities[id]));
+            }
+            clientData.entities[id].setMeta(rawEntities[id]);
+        }
         const me = clientData.players.find(x => x.meta.connId === clientData.connId);
         setTimeout(() => {
             if (me != null) {

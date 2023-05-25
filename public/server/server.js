@@ -37,6 +37,7 @@ export const serverData = {
 export const serverService = {
     addEntity: null,
     removeEntity: null,
+    broadcast: null,
     /**
      * @type {Rule}
      */
@@ -86,6 +87,10 @@ export default function activity(server) {
         }
         if (entity.appendToEngine)
             Matter.Composite.remove(engine.world, entity.body);
+    }
+
+    serverService.broadcast = (type, data) => {
+        server.broadcast(type, data);
     }
 
     const init = () => {

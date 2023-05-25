@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { input, entityType, playerType, constant, bodyLabel, bodyCategory } from "../../constant.js";
+import { input, entityType, playerType, constant, bodyLabel, bodyCategory, gameResultType } from "../../constant.js";
 import { Bullet } from "./bullet.js";
 import { serverData, serverService } from "../server.js";
 
@@ -42,6 +42,7 @@ export class Player extends Entity {
         this.isEscaped = false;
         this.isSensor = false;
         this.lastFace = input.RIGHT;
+        this.gameResultType = gameResultType.LOSE;
     }
 
     update(delta) {

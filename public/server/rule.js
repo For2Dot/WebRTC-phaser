@@ -1,5 +1,5 @@
 import { serverData, serverService, runner }  from './server.js';
-import { entityType, playerType } from '../constant.js';
+import { entityType, gameResultType, playerType } from '../constant.js';
 
 export class Rule {
     constructor() {
@@ -13,8 +13,13 @@ export class Rule {
         const players = serverData.entities.filter(x => x.entityType === entityType.PLAYER);
         const polices = players.filter(x => x.playerType === playerType.POLICE);
         const thieves = players.filter(x => x.playerType === playerType.THIEF);
-        if (thieves.find(x => x.isImprisoned))
-            server.broadcast("end", null);
+        const winThieves = thieves.filter(x => x.gameResultType === gameResultType.WIN).length;
+        const policeGameResult = winThieves >= thieves.length - 1 ? gameResultType.LOSE : gameResultType.WIN;
+        polices.forEach(x => x.gameResultType = policeGameResult);
+        
+        serverService.broadcast("end", serverData.entities
+            .filter(x => x.entityType !== entityType.WALL)
+            .map(x => x.toDTO()));
     }
 
     checkGameSet = () => {
