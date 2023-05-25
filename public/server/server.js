@@ -115,7 +115,7 @@ export default function activity(server) {
         refinedMap.filter(x => x.label === "exit2")
             .forEach(x => serverData.exits[x.label] = x);
         randomPick(refinedMap.filter(x => x.label === "generator"), constant.generatorCnt)
-            .forEach(x => { console.log(x); serverService.addEntity(new Generator(x.x, x.y, x.width, x.height))});
+            .forEach(x => {serverService.addEntity(new Generator(x.x, x.y, x.width, x.height))});
         const thiefPositions = randomPick(refinedMap.filter(x => x.label === "thief"), constant.playerCnt - 1);
         const policePositions = randomPick(refinedMap.filter(x => x.label === "police"), 1);
         for (const idx in serverData.players) {

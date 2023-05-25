@@ -69,7 +69,7 @@ export class Generator extends Entity {
 
                 if (this.genSpeed < 20)
                     this.genSpeed += 1;
-                this.genProcess += 100;
+                this.genProcess += 10;
 
                 if (this.genProcess >= 1000) {
                     this.isWorking = true;

@@ -51,9 +51,6 @@ export class Rule {
     checkAlive = () => {
         const players = serverData.entities.filter(x => x.entityType === entityType.PLAYER);
         const thieves = players.filter(x => x.playerType === playerType.THIEF);
-        console.log(thieves);
-        console.log(thieves.filter(x => x.isImprisoned === false));
-        console.log(thieves.filter(x => x.isEscaped === false));
         if (thieves.filter(x => x.isImprisoned === false)
                 .filter(x => x.isEscaped === false)
                 .length === 0)
