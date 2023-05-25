@@ -89,13 +89,29 @@ span {
 #messages {
     background-color: #ffeeff05;
     border : 1px solid #ffeeff05;
-    color: #00000010;
+    color: #00000005;
     font-size: 1em;
     width: 100%;
     height: 8em;
     overflow-y: scroll;
+    overflow-x: hidden;
     resize: none;
+    border-radius: 5px;
+    margin: 0 0 10px 0;
+    padding: 3px;
 }
+
+@keyframes fade-out {
+    0% { color: #FFF; }
+    80% { color: #FFF; }
+    100% { color: #00000005;}
+}
+
+#messages p {
+    margin: -3px 0 0 5px;
+    animation: fade-out 2s;
+}
+
 #messages::-webkit-scrollbar {
     background-color: #55667705; /* 스크롤바의 배경색 */
 }
@@ -107,6 +123,10 @@ span {
     width: 100%;
 }
 
+#message:focus-within {
+    background-color: #ffffffa0;
+}
+
 #chat-panel:hover #messages, 
 #chat-panel:hover #messages::-webkit-scrollbar, 
 #chat-panel:hover #message {
@@ -115,4 +135,9 @@ span {
 
 #chat-panel:hover #messages {
     color:#000;
+}
+
+.focused {
+    background-color: #ffffffa0;
+    color: #000;
 }

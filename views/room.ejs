@@ -16,9 +16,9 @@
 <body>
   <!-- left top -->
   <div id="connection-status" class="ab left-top">
-      <span id="data-flow-send"></span>
-      <span id="data-flow-recv"></span>
-      <span id="ping">ping : </span>
+    <span id="data-flow-send"></span>
+    <span id="data-flow-recv"></span>
+    <span id="ping">ping : </span>
   </div>
   <!-- right top -->
   <div id="game-progress" class="ab right-top">
@@ -30,10 +30,11 @@
   <!-- right bottom -->
   <div id="chat-panel" class="ab right-btm">
     <div>
-      <textarea id="messages" disabled>123</textarea>
+      <div id="messages" disabled>
+      </div>
     </div>
     <div>
-      <input type="text" id="message" size="50">
+      <input type="text" id="message" onfocus="focused()" onblur="focused()" size="50">
     </div>
   </div>
 
@@ -45,6 +46,24 @@
   <script>
     var isHost = "<%= isHost %>" === "true";
     var roomId = "<%= roomId %>";
+    let toggleFocus = false
+    function focused(){
+      toggleFocus = !toggleFocus;
+      if (toggleFocus)
+      {
+        document.getElementById("messages").style.backgroundColor = `#ffffffa0`;
+        document.getElementById("messages").style.color = `#000`;
+        document.getElementById("message").style.backgroundColor = `#ffffffa0`;
+        document.getElementById("message").style.color = `#000`;
+      }
+      else
+      {
+        document.getElementById("messages").style.backgroundColor = `#f0f8ff10`;
+        document.getElementById("messages").style.color = `#00000005`;
+        document.getElementById("message").style.backgroundColor = `#f0f8ff10`;
+        document.getElementById("message").style.color = `#00000005`;
+      }
+    }
   </script>
   <script src="/client/visibility_polygon.js"></script>
   <script src="/server/matter.js"></script>

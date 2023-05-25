@@ -127,10 +127,10 @@ export default function activity(client) {
 
     client.addEventListener("chat", ({ connId, payload }) => {
         const { id, chat } = payload;
-        const oldChat = document.getElementById("messages").value;
-        const newChat = `${oldChat}${id}: ${chat}\n`;
         const textarea = document.getElementById("messages");
-        textarea.value = newChat;
+        const newChat = document.createElement("p");
+        newChat.innerText = `${id}: ${chat}`;
+        textarea.appendChild(newChat);
         textarea.scrollTop = textarea.scrollHeight;
     });
 
@@ -161,7 +161,7 @@ export default function activity(client) {
 
     });
 
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keyup', function(event) {
         if (event.key != "Enter")
             return;
         let focusedInput = document.querySelector("#message:focus");

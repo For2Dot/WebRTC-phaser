@@ -7,7 +7,6 @@ import { Door } from "./entity/door.js";
 import { Generator } from "./entity/generator.js";
 import { ElevatorDoor } from "./entity/elevatorDoor.js";
 import { Rule } from "./rule.js";
-import { clientData } from "../client/client.js";
 
 const tiles = await fetch("/assets/map.json").then(x => x.json());
 
