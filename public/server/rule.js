@@ -5,7 +5,8 @@ export class Rule {
     constructor() {
         this.startTime = Date.now();
         this.electricity = false;
-        this.checkingGameSet = false;
+        // exit 4개 까지 가능
+        // this.isEscapingInExit = [false, false, false, false];
     }
 
     gameOver = () => {
@@ -24,37 +25,28 @@ export class Rule {
     }
 
 
-    checkGameSet = (Exitgroup) => {
-        if (this.checkingGameSet) return;
-        this.checkingGameSet = true;
-
+    escape = (Exitgroup) => {
         const players = serverData.entities.filter(x => x.entityType === entityType.PLAYER);
         const thieves = players.filter(x => x.playerType === playerType.THIEF);
         const exit = serverData.exits[`exit${Exitgroup}`];
-        console.log(exit);
 
         thieves.forEach(thief => {
-            console.log(thief.body.position);
-
-            if (thief.body.position.x > exit.x - exit.width / 2 && thief.body.position.x < exit.x + exit.width / 2
-                && thief.body.position.y > exit.y - exit.height / 2 && thief.body.position.y < exit.y + exit.height / 2) {
+            if (thief.body.position.x > exit.x - exit.width / 2 - 8 && thief.body.position.x < exit.x + exit.width / 2 + 8
+                && thief.body.position.y > exit.y - exit.height / 2 - 8 && thief.body.position.y < exit.y + exit.height / 2 + 8) {
                 thief.isEscaped = true;
-                // serverService.removeEntity(thief);
-                // server.broadcast("escape", { id: thief.connId });
+                console.log('escaped', thief);
             }
         });
+        setTimeout(() => {
+            this.checkAllEscaped();
+        }, 500);
+    }
 
-        /**
-         * Todo
-         * 1. 엘베 문이 닫히면 이 함수가 실행된다.
-         * 2. 엘베 공간 안에 있는 도둑은 관전자가 된다.
-         *      - 엘베 공간에 존재하는지 체크
-         *      - 엘베 공간에 경찰이 존재하면 모두 패배
-         *      - 관전자 = isSensor = true(충돌x, 벽 뚫어짐), 시야 없앨수 있으면 좋겠다.
-         * 3. 도둑이 남아있으면 누군가 탈출했다고 알림을 보낸다.
-         * 4. 모든 도둑이 탈출했으면 gameOver() 실행
-        */ 
-
+    checkAllEscaped = () => {
+        const players = serverData.entities.filter(x => x.entityType === entityType.PLAYER);
+        const thieves = players.filter(x => x.playerType === playerType.THIEF);
+        if (thieves.filter(x => x.isEscaped === false).length === 0)
+            this.gameOver();
     }
 
     checkAlive = () => {
@@ -67,7 +59,6 @@ export class Rule {
                 .filter(x => x.isEscaped === false)
                 .length === 0)
             this.gameOver();
-
     }
 
     checkGenerator = () => {

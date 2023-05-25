@@ -22,7 +22,6 @@ export const entityType = {
     EVDOOR: "elevatorDoor",
     GENERATOR: "generator",
     BULLET: "bullet",
-    EXIT: "exit",
 }
 
 export const gameResultType = {

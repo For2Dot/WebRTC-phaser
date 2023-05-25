@@ -7,7 +7,6 @@ import Wall from "./entity/wall.js";
 import Door from "./entity/door.js";
 import Generator from "./entity/generator.js";
 import ElevatorDoor from "./entity/elevatorDoor.js";
-import Exit from "./entity/exit.js";
 
 export default class BootScene extends Phaser.Scene {
 	constructor() {
@@ -24,7 +23,6 @@ export default class BootScene extends Phaser.Scene {
 		ElevatorDoor.prelodad(this);
 		Generator.prelodad(this);
 		Bullet.prelodad(this);
-		Exit.prelodad(this);
 	}
 
 	create() {

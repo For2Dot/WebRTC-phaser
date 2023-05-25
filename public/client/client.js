@@ -8,7 +8,6 @@ import Door from "./entity/door.js";
 import Generator from "./entity/generator.js";
 import Bullet from "./entity/bullet.js";
 import ElevatorDoor from "./entity/elevatorDoor.js";
-import Exit from "./entity/exit.js";
 
 export const clientData = {
     players: [],
@@ -70,8 +69,6 @@ export const createEntity = (meta) => {
         entity = new Generator(meta);
     else if (meta.type == entityType.BULLET)
         entity = new Bullet(meta);
-    else if (meta.type == entityType.EXIT)
-        entity = new Exit(meta);
     else
         throw new Error("entity type is not defined");
     return entity;

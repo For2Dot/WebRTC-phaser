@@ -48,10 +48,10 @@ export class ElevatorDoor extends Entity {
 
         if (byOther)
             return ;
-
+        console.log(`closeEVDoor ${this.group}`);
         serverData.entities.filter(x => x.entityType === entityType.EVDOOR && x.group === this.group && x !== this && x.isOpened === true)
             .forEach(x => x.closeDoor(true));
-        serverService.rule.checkGameSet(this.group);
+        serverService.rule.escape(this.group);
         serverService.rule.resetGenerators();
     }
 
