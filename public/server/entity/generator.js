@@ -61,7 +61,7 @@ export class Generator extends Entity {
     }
 
     interact(who) {
-        if (this.genProcess >= 1000)
+        if (this.isWorking == true)
             return;
         if (who === playerType.THIEF) {
 
