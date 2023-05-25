@@ -13,8 +13,6 @@ span {
     color: azure;
 }
 
-
-
 .ab {
     position: absolute;
 }
@@ -71,6 +69,7 @@ span {
 }
 
 #start {
+    position: absolute;
     z-index: 1;
     width: 200px;
     height: 100px;
@@ -112,32 +111,14 @@ span {
     animation: fade-out 2s;
 }
 
-#messages::-webkit-scrollbar {
-    background-color: #55667705; /* 스크롤바의 배경색 */
-}
-
 #chat-panel #message {
-    background-color: #f0f8ff10;
-    border : 1px solid #f0f8ff10;
+    background-color: #f0f8ff30;
+    border : 1px solid #f0f8ff30;
     color: #000;
     width: 100%;
 }
 
-#message:focus-within {
-    background-color: #ffffffa0;
-}
-
 #chat-panel:hover #messages, 
-#chat-panel:hover #messages::-webkit-scrollbar, 
 #chat-panel:hover #message {
     background-color: #ffffffa0;
-}
-
-#chat-panel:hover #messages {
-    color:#000;
-}
-
-.focused {
-    background-color: #ffffffa0;
-    color: #000;
 }

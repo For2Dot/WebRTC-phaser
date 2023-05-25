@@ -28,21 +28,17 @@
   </div>
 
   <!-- right bottom -->
-  <div id="chat-panel" class="ab right-btm">
-    <div>
-      <div id="messages" disabled>
-      </div>
-    </div>
-    <div>
-      <input type="text" id="message" onfocus="focused()" onblur="focused()" size="50">
-    </div>
+  <div id="chat-panel" class="ab right-btm" onmouseover="focused()" onmouseout="focused()" >
+      <div id="messages" disabled></div>
+      <input type="text" id="message" onfocus="focused()" onblur="focused()" size="50" placeholder="메세지 입력 후 Enter"/>
   </div>
 
-  <div id="simple-game">
-    <% if (isHost) { %>
-      <button id="start" disabled>start</button>
-      <% } %>
-  </div>
+  <!-- center -->
+  <% if (isHost) { %>
+    <button id="start" disabled>start</button>
+  <% } %>
+
+  <div id="simple-game"></div>
   <script>
     var isHost = "<%= isHost %>" === "true";
     var roomId = "<%= roomId %>";
@@ -58,9 +54,9 @@
       }
       else
       {
-        document.getElementById("messages").style.backgroundColor = `#f0f8ff10`;
+        document.getElementById("messages").style.backgroundColor = `#f0f8ff05`;
         document.getElementById("messages").style.color = `#00000005`;
-        document.getElementById("message").style.backgroundColor = `#f0f8ff10`;
+        document.getElementById("message").style.backgroundColor = `#f0f8ff05`;
         document.getElementById("message").style.color = `#00000005`;
       }
     }
