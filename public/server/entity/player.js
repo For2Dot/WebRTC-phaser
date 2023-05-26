@@ -125,7 +125,7 @@ export class Player extends Entity {
     imprison() {
         this.isImprisoned = true;
         this.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = true;
-        this.speed = 10;
+        this.speed = 5;
         serverService.rule.checkAlive(this);
     }
 
@@ -148,7 +148,7 @@ export class Player extends Entity {
             this.imprison();
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
-            if (!this.isImprisoned) return ;
+            if (!this.isImprisoned || target.isImprisoned) return ;
             this.speed = 55;
             this.isImprisoned = false;
             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = false;
