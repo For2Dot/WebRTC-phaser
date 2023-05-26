@@ -37,7 +37,6 @@ export class ElevatorDoor extends Entity {
 
         if (byOther)
             return ;
-
         serverData.entities.filter(x => x.entityType === entityType.EVDOOR && x.group === this.group && x !== this && x.isOpened === false)
             .forEach(x => x.openDoor(true));
     }
@@ -90,10 +89,5 @@ export class ElevatorDoor extends Entity {
         const target = serverData.entityBodyMap[targetBody.id];
         if (target.entityType === entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT])
             this.interact(target.playerType);
-            
-        if (target.entityType === entityType.PLAYER && !target.isImprisoned && target.key[input.INTERACT])
-            if (target.playerType === playerType.THIEF)
-                if (this.isOpened)
-                    target.isEscaped = true;
     };
 }
