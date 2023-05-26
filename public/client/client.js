@@ -183,6 +183,8 @@ export default function activity(client) {
 
 
     client.addEventListener("pong", ({ connId, payload }) => {
+        const { id, gameStartTime } = payload;
+        startTime = gameStartTime;
         let elapsed_time = Date.now() - ping_ms;
         document.getElementById("ping").innerText = `ping: ${elapsed_time}ms`;
     });
@@ -198,7 +200,6 @@ export default function activity(client) {
                 `⏳ ${Math.floor(leftTime / 60)}:${Math.floor(leftTime % 60) < 10 ? "0" : ""}${Math.floor(leftTime % 60)}`;
 
             if (leftTime < 30)
-                // change color of left-time
                 document.getElementById("left-time").style.color = "red";
             gameProgressCounter();
         }
