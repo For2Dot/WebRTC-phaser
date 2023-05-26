@@ -4,14 +4,14 @@ import { constant, entityType, input, bodyCategory, bodyLabel, playerType } from
 
 export class ElevatorDoor extends Entity {
     constructor(x, y, w, h, group) {
-        super(Matter.Bodies.rectangle(x, y,
-            constant.blockCenter,
-            constant.blockCenter,
+        super(Matter.Bodies.rectangle(x, y, w, h,
             {
                 isStatic: true,
                 collisionFilter: { category: bodyCategory.SENSOR_TARGET }
             },
         ));
+        this.width = w;
+        this.height = h;
         this.entityType = entityType.EVDOOR;
         this.body.label = entityType.EVDOOR;
         this.isStatic = true;
@@ -24,8 +24,8 @@ export class ElevatorDoor extends Entity {
     toDTO() {
         return {
             ...super.toDTO(),
-            width: constant.blockCenter,
-            height: constant.blockCenter,
+            width: this.width,
+            height: this.height,
             isOpened: this.isOpened,
             alertType: this.alertType,
         }

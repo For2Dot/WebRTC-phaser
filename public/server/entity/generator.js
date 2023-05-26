@@ -3,15 +3,16 @@ import { bodyCategory, bodyLabel, constant, entityType, input, playerType } from
 import { serverData, serverService } from "../server.js";
 
 export class Generator extends Entity {
-    constructor(x, y, code) {
-        super(Matter.Bodies.rectangle(x, y, constant.blockCenter, constant.blockCenter, {
+    constructor(x, y, w, h) {
+        super(Matter.Bodies.rectangle(x, y, w, h,{
             isStatic: true, collisionFilter: {
                 category: bodyCategory.SENSOR_TARGET,
             }
         }));
         this.entityType = entityType.GENERATOR;
         this.body.label = entityType.GENERATOR;
-        this.wallCode = code;
+        this.width = w;
+        this.height = h;
         this.isStatic = true;
         this.genProcess = 0;
         this.progressRate = 0;
@@ -24,8 +25,8 @@ export class Generator extends Entity {
     toDTO() {
         return {
             ...super.toDTO(),
-            width: constant.blockCenter,
-            height: constant.blockCenter,
+            width: this.width,
+            height: this.height,
             progressRate: this.progressRate,
             alertType: this.alertType,
         }
