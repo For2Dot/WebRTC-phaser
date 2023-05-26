@@ -145,7 +145,7 @@ export default function activity(server) {
 
     server.addEventListener("ping", ({ connId, payload }) => {
         lastPing[connId] = Date.now();
-        server.send(connId, "pong", { id: connId, gameStartTime: serverService.rule.gameStartTime });
+        server.send(connId, "pong", { id: connId, gameStartTime: serverService?.rule?.gameStartTime });
     });
 
     server.addConnListener((connId, state) => {

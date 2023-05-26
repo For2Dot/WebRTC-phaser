@@ -184,7 +184,9 @@ export default function activity(client) {
 
     client.addEventListener("pong", ({ connId, payload }) => {
         const { id, gameStartTime } = payload;
-        startTime = gameStartTime;
+        console.log("pong", gameStartTime);
+        if (gameStartTime != null)
+            startTime = gameStartTime;
         let elapsed_time = Date.now() - ping_ms;
         document.getElementById("ping").innerText = `ping: ${elapsed_time}ms`;
     });
