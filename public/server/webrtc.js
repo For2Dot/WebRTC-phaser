@@ -256,9 +256,9 @@ class Connection {
         } catch (e) {
             if (this.disconnected) 
                 return;
-            this.disconnected = true;
-            alert("Disconnected from server");
+            alert("누군가가 방을 이탈하여 게임을 종료합니다 😣");
             window.history.back();
+            this.disconnected = true;
         }
     }
 
