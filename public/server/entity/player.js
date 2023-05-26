@@ -32,7 +32,7 @@ export class Player extends Entity {
         this.dx = 1;
         this.dy = 0;
         this.stamina = constant.maximumStamina;
-        this.speed = isPolice ? 60 : 50;
+        this.speed = isPolice ? 60 : 55;
         this.playerType = isPolice ? playerType.POLICE : playerType.THIEF;
         this.body.label = this.playerType;
         this.lastSprintTime = Date.now();
@@ -149,7 +149,7 @@ export class Player extends Entity {
         }
         else if (target.playerType === playerType.THIEF && this.playerType === playerType.THIEF){
             if (!this.isImprisoned) return ;
-            this.speed = 50;
+            this.speed = 55;
             this.isImprisoned = false;
             me.body.parts.find(x => x.label === bodyLabel.PLAYER).isSensor = false;
         }
